@@ -1,13 +1,24 @@
 {
   "expo": {
-    "name": "fleet",
-    "slug": "fleet",
+    "name": "FleetSync",
+    "slug": "fleetsync-driver",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
+    "scheme": "fleetsync",
+    "plugins": [
+      "expo-router",
+      "expo-sqlite",
+      ["expo-camera", { "cameraPermission": "FleetSync uses the camera for duty declarations, defects and delivery evidence.", "barcodeScannerEnabled": true }],
+      ["expo-location", { "locationWhenInUsePermission": "FleetSync records location with shift, job and compliance events." }],
+      ["expo-image-picker", { "photosPermission": "FleetSync attaches selected photos to operational records." }],
+      ["expo-local-authentication", { "faceIDPermission": "Use Face ID to unlock FleetSync." }],
+      ["expo-notifications", { "color": "#0E2033" }]
+    ],
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": false,
+      "bundleIdentifier": "com.thebrainburners.fleetsync"
     },
     "android": {
       "adaptiveIcon": {
@@ -16,7 +27,9 @@
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.thebrainburners.fleetsync",
+      "permissions": ["CAMERA", "ACCESS_COARSE_LOCATION", "ACCESS_FINE_LOCATION", "POST_NOTIFICATIONS"]
     },
     "web": {
       "favicon": "./assets/favicon.png"
