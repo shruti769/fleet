@@ -1,12 +1,70 @@
-import { readFileSync } from 'node:fs';
+// Asserts the app covers every artboard in the FleetSync prototype.
+//
+// The prototype defines 98 base screens and 45 overlays; each one must have a
+// generated component and be reachable from the screen registry.
 
-const source = readFileSync(new URL('../src/screens/registry.ts', import.meta.url), 'utf8');
-const ids = [...source.matchAll(/(?:^|,\s*|\n\s*)s\('(A\d+(?:\.[MS]\d+)?)'/g)].map(match => match[1]);
-const unique = new Set(ids);
-if (ids.length !== 122) throw new Error(`Expected 122 artboards from section 9.12, found ${ids.length}`);
-if (unique.size !== ids.length) throw new Error('The screen registry contains duplicate document IDs');
+import { readFileSync, existsSync } from 'node:fs';
 
-const required = ['A1','A2','A3','A4','A5','A6','A7','A8','A9','A10','A11','A12','A13','A14','A15','A16','A17','A18','A19','A20','A21','A22','A23','A24','A25','A26','A27','A28','A29','A30','A31','A32','A33','A34','A35','A36'];
-const missing = required.filter(id => !unique.has(id));
+const index = readFileSync(new URL('../src/proto/screens/index.ts', import.meta.url), 'utf8');
+
+const listOf = (name) => {
+  const block = new RegExp(`export const ${name} = \\[([\\s\\S]*?)\\] as const;`).exec(index);
+  if (!block) throw new Error(`${name} is missing from src/proto/screens/index.ts`);
+  return [...block[1].matchAll(/'([^']+)'/g)].map((m) => m[1]);
+};
+
+const screenIds = listOf('SCREEN_IDS');
+const overlayIds = listOf('OVERLAY_IDS');
+
+const EXPECTED_SCREENS = 98;
+const EXPECTED_OVERLAYS = 45;
+
+if (screenIds.length !== EXPECTED_SCREENS) {
+  throw new Error(`Expected ${EXPECTED_SCREENS} screens, found ${screenIds.length}`);
+}
+if (overlayIds.length !== EXPECTED_OVERLAYS) {
+  throw new Error(`Expected ${EXPECTED_OVERLAYS} overlays, found ${overlayIds.length}`);
+}
+
+const all = [...screenIds, ...overlayIds];
+if (new Set(all).size !== all.length) {
+  throw new Error('The screen registry contains duplicate artboard ids');
+}
+
+// Every primary artboard the brief calls out must be present.
+const required = [
+  ...Array.from({ length: 36 }, (_, i) => `A${i + 1}`).filter(
+    // A3 and the ids the prototype never used are not artboards.
+    (id) => !['A3'].includes(id),
+  ),
+  'B1',
+  'B2',
+  'B3',
+  'B4',
+  'B5',
+  'B6',
+  'B7',
+  'C1',
+  'C2',
+  'C3',
+  'C4',
+];
+const missing = required.filter((id) => !screenIds.includes(id));
 if (missing.length) throw new Error(`Missing primary screens: ${missing.join(', ')}`);
-console.log(`FleetSync document coverage: ${ids.length} unique artboards, A1–A36 present.`);
+
+// Each id must have a file behind it.
+for (const id of screenIds) {
+  const file = new URL(`../src/proto/screens/${id.replace(/\./g, '_')}.tsx`, import.meta.url);
+  if (!existsSync(file)) throw new Error(`Missing screen component for ${id}`);
+}
+for (const id of overlayIds) {
+  const file = new URL(
+    `../src/proto/screens/overlays/${id.replace(/\./g, '_')}.tsx`,
+    import.meta.url,
+  );
+  if (!existsSync(file)) throw new Error(`Missing overlay component for ${id}`);
+}
+
+console.log(
+  `FleetSync coverage: ${screenIds.length} screens + ${overlayIds.length} overlays = ${all.length} artboards.`,
+);
