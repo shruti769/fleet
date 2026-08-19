@@ -29,23 +29,18 @@ export function DashboardScreen() {
             }
             style={styles.companyPill}
           >
-            <View style={styles.companyMark}>
-              <Text style={styles.companyCode}>RF</Text>
-            </View>
             <Text numberOfLines={1} style={styles.companyName}>
-              Redgum Freightlines
+              Barwon Fuel Haulage
             </Text>
             <MaterialIcons name="swap-horiz" size={22} color={colors.amber} />
           </Pressable>
-          <Pressable onPress={() => router.push("/screen/A34")}>
-            <Image
-              source={require("../../../../assets/driver-profile.png")}
-              style={styles.avatar}
-            />
+          <Pressable onPress={() => router.push("/screen/A22")} style={styles.notification}>
+            <MaterialIcons name="notifications-none" size={29} color="#FFFFFF" />
+            <View style={styles.notificationDot} />
           </Pressable>
         </View>
-        <Text style={styles.greeting}>Morning, Dave</Text>
-        <Text style={styles.date}>Wednesday 8 July</Text>
+        <Text style={styles.greeting}>Good morning, Dave</Text>
+        <Text style={styles.date}>Wednesday 8 July · {running ? "Clocked on" : "Clocked off"}</Text>
       </View>
       <ScrollView
         style={styles.body}
@@ -58,13 +53,7 @@ export function DashboardScreen() {
           }
           style={[styles.clockButton, running && styles.clockButtonRunning]}
         >
-          <View style={styles.playCircle}>
-            <MaterialIcons
-              name={running ? "stop" : "play-arrow"}
-              size={21}
-              color={running ? colors.breach : colors.onTime}
-            />
-          </View>
+          <MaterialIcons name={running ? "stop-circle" : "schedule"} size={26} color={colors.ink} />
           <Text style={styles.clockLabel}>
             {running ? "Clock off" : "Clock on"}
           </Text>
@@ -72,57 +61,37 @@ export function DashboardScreen() {
         <View style={styles.statsRow}>
           <View style={styles.statCard}>
             <Text style={styles.eyebrow}>THIS SHIFT</Text>
-            <Text style={styles.statValue}>{running ? "03:33" : "–"}</Text>
+            <Text style={styles.statValue}>{running ? "03:33" : "00:00"}</Text>
             <Text style={styles.statCaption}>
               {running ? "On duty" : "Not started"}
             </Text>
           </View>
           <View style={styles.statCard}>
             <Text style={styles.eyebrow}>THIS WEEK</Text>
-            <Text style={styles.statValue}>31:42</Text>
-            <Text style={styles.statCaption}>of 72:00</Text>
+            <Text numberOfLines={1} style={styles.statValue}>31 h 45 m</Text>
+            <Text style={styles.statCaption}>4 days worked</Text>
+          </View>
+          <View style={styles.statCard}>
+            <Text style={styles.eyebrow}>NEXT JOB</Text>
+            <Text style={styles.jobCode}>CN-48213</Text>
+            <Text style={styles.statCaption}>09:30</Text>
           </View>
         </View>
-        <Pressable
-          onPress={() => router.push(running ? "/screen/A5" : "/screen/A3")}
-          style={styles.jobCard}
-        >
-          <Image
-            source={require("../../../../assets/job-coastline.png")}
-            style={styles.jobImage}
-          />
-          <View style={styles.jobCopy}>
-            <Text style={styles.eyebrow}>NEXT JOB</Text>
-            <Text numberOfLines={1} style={styles.jobTitle}>
-              Coastline Grocers, Wodonga
-            </Text>
-            <Text numberOfLines={1} style={styles.jobSubtitle}>
-              {running
-                ? "08:45–10:15 · 22 pallets"
-                : "Clock on to see your run"}
-            </Text>
-          </View>
-          {!running && (
-            <MaterialIcons name="lock-outline" size={27} color={colors.amber} />
-          )}
-        </Pressable>
         <View style={styles.availabilityCard}>
-          <Text numberOfLines={1} style={styles.availabilityTitle}>
-            Looking for work
-          </Text>
-          <View style={styles.phasePill}>
-            <Text style={styles.phaseText}>Phase 2</Text>
+          <View style={styles.availabilityTop}>
+            <Text style={styles.availabilityTitle}>Looking for work</Text>
+            <MaterialIcons name="info-outline" size={22} color={colors.muted} />
+            <Switch
+              value={state.availability}
+              onValueChange={state.toggleAvailability}
+              trackColor={{ false: "#D9E1EC", true: "#93B4F8" }}
+              thumbColor={state.availability ? colors.actionBlue : "#FFFFFF"}
+            />
           </View>
-          <MaterialIcons name="info-outline" size={25} color={colors.muted} />
-          <Switch
-            value={state.availability}
-            onValueChange={state.toggleAvailability}
-            trackColor={{ false: "#C8D3E2", true: "#93B4F8" }}
-            thumbColor={state.availability ? colors.actionBlue : "#FFFFFF"}
-          />
+          <Text style={styles.availabilityText}>Off means no operator can see you. Turn it on to take extra work around your Redgum shifts.</Text>
         </View>
       </ScrollView>
-      <BottomTabBar active="Dashboard" />
+      <BottomTabBar active="Run" hideBadges />
     </SafeAreaView>
   );
 }
@@ -138,9 +107,9 @@ const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.midNavy },
   header: {
     backgroundColor: colors.midNavy,
-    paddingHorizontal: 25,
-    paddingTop: 8,
-    paddingBottom: 20,
+    paddingHorizontal: 14,
+    paddingTop: 7,
+    paddingBottom: 18,
   },
   headerRow: {
     flexDirection: "row",
@@ -148,17 +117,16 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
   },
   companyPill: {
-    height: 48,
+    height: 36,
     maxWidth: "72%",
-    paddingHorizontal: 13,
-    paddingRight: 16,
-    borderRadius: 24,
+    paddingHorizontal: 12,
+    borderRadius: 19,
     borderWidth: 1,
     borderColor: "#71849A",
     backgroundColor: "#38516A",
     flexDirection: "row",
     alignItems: "center",
-    gap: 10,
+    gap: 8,
   },
   companyMark: {
     width: 31,
@@ -172,9 +140,11 @@ const styles = StyleSheet.create({
   companyName: {
     flexShrink: 1,
     color: "#FFF",
-    fontFamily: headingFont,
-    fontSize: 16,
+    fontSize: 13,
+    fontWeight: "700",
   },
+  notification: { width: 38, height: 38, alignItems: "center", justifyContent: "center" },
+  notificationDot: { position: "absolute", right: 4, top: 3, width: 7, height: 7, borderRadius: 4, backgroundColor: "#EF4444" },
   avatar: {
     width: 46,
     height: 46,
@@ -183,35 +153,34 @@ const styles = StyleSheet.create({
     borderColor: "#FFF",
   },
   greeting: {
-    marginTop: 18,
+    marginTop: 16,
     color: "#FFF",
     fontFamily: headingFont,
-    fontSize: 37,
-    lineHeight: 41,
+    fontSize: 29,
+    lineHeight: 34,
   },
   date: {
     marginTop: 1,
     color: "#D5DEEA",
-    fontSize: 18,
-    fontFamily: "BarlowSemiCondensed_600SemiBold",
+    fontSize: 13,
   },
   body: { flex: 1, backgroundColor: colors.appBg },
   content: {
-    paddingHorizontal: 25,
-    paddingTop: 15,
-    gap: 10,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    gap: 16,
     paddingBottom: 15,
   },
   clockButton: {
-    height: 82,
-    borderRadius: 20,
-    backgroundColor: "#17AA4B",
+    height: 62,
+    borderRadius: 14,
+    backgroundColor: "#FFA51B",
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "center",
-    gap: 15,
-    shadowColor: "#16A34A",
-    shadowOpacity: 0.23,
+    gap: 12,
+    shadowColor: "#D97706",
+    shadowOpacity: 0.16,
     shadowRadius: 10,
     shadowOffset: { width: 0, height: 6 },
     elevation: 5,
@@ -225,20 +194,20 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "center",
   },
-  clockLabel: { color: "#FFF", fontFamily: headingFont, fontSize: 27 },
-  statsRow: { flexDirection: "row", gap: 12 },
+  clockLabel: { color: colors.ink, fontSize: 18, fontWeight: "700" },
+  statsRow: { flexDirection: "row", gap: 10 },
   statCard: {
     ...shadow,
     flex: 1,
-    height: 96,
-    borderRadius: 20,
+    height: 98,
+    borderRadius: 17,
     backgroundColor: "#FFF",
-    paddingHorizontal: 20,
-    paddingVertical: 12,
+    paddingHorizontal: 13,
+    paddingVertical: 14,
   },
   eyebrow: {
     color: colors.muted,
-    fontSize: 13,
+    fontSize: 10,
     fontWeight: "800",
     letterSpacing: 0.8,
   },
@@ -246,10 +215,12 @@ const styles = StyleSheet.create({
     marginTop: 4,
     color: colors.ink,
     fontFamily: headingFont,
-    fontSize: 29,
-    lineHeight: 31,
+    fontSize: 20,
+    lineHeight: 26,
+    letterSpacing: -0.35,
   },
-  statCaption: { color: colors.muted, fontSize: 15 },
+  statCaption: { color: colors.muted, fontSize: 12 },
+  jobCode: { marginTop: 8, color: colors.ink, fontFamily: "monospace", fontSize: 13, fontWeight: "700" },
   jobCard: {
     ...shadow,
     height: 92,
@@ -266,27 +237,18 @@ const styles = StyleSheet.create({
   jobSubtitle: { color: colors.muted, fontSize: 15 },
   availabilityCard: {
     ...shadow,
-    height: 66,
-    borderRadius: 20,
+    minHeight: 112,
+    borderRadius: 17,
     backgroundColor: "#FFF",
     paddingHorizontal: 18,
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
+    paddingVertical: 16,
   },
+  availabilityTop: { flexDirection: "row", alignItems: "center", gap: 10 },
   availabilityTitle: {
     flex: 1,
     color: colors.ink,
-    fontSize: 17,
+    fontSize: 16,
     fontWeight: "700",
   },
-  phasePill: {
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#B9CBE1",
-    backgroundColor: "#EDF4FD",
-    paddingHorizontal: 13,
-    paddingVertical: 4,
-  },
-  phaseText: { color: colors.midNavy, fontSize: 13, fontWeight: "700" },
+  availabilityText: { marginTop: 10, color: colors.muted, fontSize: 13, lineHeight: 18 },
 });

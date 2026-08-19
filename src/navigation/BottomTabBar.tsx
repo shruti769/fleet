@@ -8,15 +8,15 @@ import { useAppState } from "@/state/AppState";
 import { routes } from "@/utils/routes";
 
 const tabs = [
-  ["dashboard", "Dashboard", routes.dashboard],
-  ["list-alt", "Run", routes.run],
+  ["assignment", "Run", routes.dashboard],
   ["navigation", "Navigate", routes.navigate],
+  ["verified-user", "Compliance", routes.compliance],
   ["chat-bubble-outline", "Messages", routes.messages],
   ["person-outline", "Profile", routes.profile],
 ] as const;
 type TabName = (typeof tabs)[number][1];
 
-export function BottomTabBar({ active }: { active?: TabName }) {
+export function BottomTabBar({ active, hideBadges = false }: { active?: TabName; hideBadges?: boolean }) {
   const state = useAppState();
   const insets = useSafeAreaInsets();
   const workUnlocked = useWorkAccess();
@@ -24,7 +24,7 @@ export function BottomTabBar({ active }: { active?: TabName }) {
     <View
       style={[
         styles.root,
-        { height: 61 + insets.bottom, paddingBottom: insets.bottom },
+        { height: 52 + insets.bottom, paddingBottom: insets.bottom },
       ]}
     >
       {tabs.map(([icon, label, path]) => {
@@ -44,7 +44,7 @@ export function BottomTabBar({ active }: { active?: TabName }) {
             }
             style={styles.tab}
           >
-            <MaterialIcons name={icon} size={25} color={color} />
+            <MaterialIcons name={icon} size={23} color={color} />
             <Text
               style={[
                 styles.label,
@@ -54,7 +54,7 @@ export function BottomTabBar({ active }: { active?: TabName }) {
             >
               {label}
             </Text>
-            {label === "Messages" && state.unreadMessages > 0 && (
+            {!hideBadges && label === "Messages" && state.unreadMessages > 0 && (
               <View style={styles.badge}>
                 <Text style={styles.badgeText}>{state.unreadMessages}</Text>
               </View>
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
   },
   tab: { flex: 1, alignItems: "center", justifyContent: "center", gap: 3 },
-  label: { fontSize: 11, fontWeight: "600" },
+  label: { fontSize: 10, fontWeight: "600" },
   selectedLabel: { fontWeight: "800" },
   badge: {
     position: "absolute",

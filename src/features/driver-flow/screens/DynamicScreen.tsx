@@ -1,6 +1,5 @@
 import { forwardRef, useImperativeHandle, useRef, useState } from "react";
 import {
-  Alert,
   Image,
   Linking,
   Modal,
@@ -8,6 +7,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
@@ -96,7 +96,16 @@ export function DynamicScreen({ id }: { id: string }) {
       </ScreenShell>
     );
   if (id === "A2") return <SignInStandalone />;
+  if (id === "A37") return <AccountCreationStandalone />;
+  if (id === "A38") return <YourFileStandalone />;
+  if (id === "A38.C") return <ComplianceStandalone />;
+  if (id === "A38.S") return <ShareFileStandalone />;
+  if (["A38.L", "A38.M", "A38.F", "A38.D", "A38.V", "A38.T"].includes(id))
+    return <DocumentDetailStandalone id={id} />;
   if (id === "A26") return <CompanyTodayStandalone />;
+  if (id === "A26.A") return <AddCompanyStandalone />;
+  if (id === "A26.L") return <CompanyLinkedStandalone />;
+  if (id === "A26.LI") return <CompanyLinkedStandalone showAcceptedPopup />;
   if (id === "A35") return <PermissionsPrimerStandalone />;
   if (id === "A36") return <ProfileSetupStandalone />;
   const footer = ["A4", "A6", "A22", "A34"].includes(id) ? (
@@ -112,6 +121,8 @@ export function DynamicScreen({ id }: { id: string }) {
 function SignInStandalone() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [signInAttempted, setSignInAttempted] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
   const [resetOpen, setResetOpen] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   return (
@@ -120,43 +131,60 @@ function SignInStandalone() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={signInStyles.content}
       >
-        <Text style={signInStyles.brand}>FLEETSYNC</Text>
-        <Text style={signInStyles.title}>Sign in</Text>
-        <Text
-          style={signInStyles.subtitle}
-          numberOfLines={1}
-          adjustsFontSizeToFit
-          minimumFontScale={0.8}
-        >
-          Your own email and password. No company code.
-        </Text>
+        <View style={signInStyles.mark} accessibilityLabel="FleetSync">
+          <View style={[signInStyles.markLine, signInStyles.markLineShort]} />
+          <View style={[signInStyles.markLine, signInStyles.markLineMiddle]} />
+          <View style={[signInStyles.markLine, signInStyles.markLineAmber]} />
+        </View>
+        <View style={signInStyles.intro}>
+          <Text style={signInStyles.title}>Sign in to start your shift</Text>
+          <Text style={signInStyles.subtitle}>Wednesday 8 July 2026</Text>
+        </View>
         <View style={signInStyles.form}>
-          <Field
-            label="Email"
-            labelStyle={signInStyles.fieldLabel}
-            value={email}
-            onChangeText={setEmail}
-            autoCapitalize="none"
-            keyboardType="email-address"
-          />
-          <Field
-            label="Password"
-            labelStyle={signInStyles.fieldLabel}
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
-          <Button
-            label="Sign in"
-            disabled={!email.trim() || !password.trim()}
-            onPress={() => go("A26")}
-          />
-          <Button
-            label="◉  Use Face ID"
-            tone="secondary"
-            accentOutline
-            onPress={() => go("A26")}
-          />
+          <View style={signInStyles.field}>
+            <Text style={signInStyles.fieldLabel}>Email</Text>
+            <TextInput
+              value={email}
+              onChangeText={setEmail}
+              autoCapitalize="none"
+              keyboardType="email-address"
+              autoComplete="email"
+              placeholder="Enter your email"
+              placeholderTextColor="#94A3B8"
+              style={[signInStyles.input, signInAttempted && !email.trim() && signInStyles.inputError]}
+            />
+            {signInAttempted && !email.trim() && <Text style={signInStyles.errorText}>Please enter your email</Text>}
+          </View>
+          <View style={signInStyles.field}>
+            <Text style={signInStyles.fieldLabel}>Password</Text>
+            <TextInput
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+              placeholder="Enter your password"
+              placeholderTextColor="#94A3B8"
+              autoComplete="current-password"
+              style={[signInStyles.input, signInAttempted && !password.trim() && signInStyles.inputError]}
+            />
+            {signInAttempted && !password.trim() && <Text style={signInStyles.errorText}>Please enter your password</Text>}
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Sign in"
+            onPress={() => {
+              if (!email.trim() || !password.trim()) {
+                setSignInAttempted(true);
+                return;
+              }
+              go("A26", true);
+            }}
+            style={({ pressed }) => [
+              signInStyles.signInButton,
+              pressed ? signInStyles.pressed : null,
+            ]}
+          >
+            <Text style={signInStyles.signInButtonText}>Sign in</Text>
+          </Pressable>
           <Pressable
             accessibilityRole="button"
             onPress={() => setResetOpen(true)}
@@ -164,7 +192,26 @@ function SignInStandalone() {
           >
             <Text style={signInStyles.forgotText}>Forgot password</Text>
           </Pressable>
+          <View style={signInStyles.dividerRow}>
+            <View style={signInStyles.divider} />
+            <Text style={signInStyles.dividerText}>New to FleetSync</Text>
+            <View style={signInStyles.divider} />
+          </View>
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Create an account"
+            onPress={() => go("A37")}
+            style={({ pressed }) => [
+              signInStyles.createButton,
+              pressed && signInStyles.pressed,
+            ]}
+          >
+            <Text style={signInStyles.createButtonText}>Create an account</Text>
+          </Pressable>
         </View>
+        <Text style={signInStyles.version}>
+          Version 4.2.0 · Redgum Freightlines and 1 other operator
+        </Text>
       </ScrollView>
       <Modal
         visible={resetOpen}
@@ -184,43 +231,16 @@ function SignInStandalone() {
             }}
             style={signInStyles.scrim}
           />
-          <View style={signInStyles.sheet}>
+          <View style={[signInStyles.sheet, resetSent && signInStyles.successSheet]}>
             <View style={signInStyles.handle} />
-            <View style={signInStyles.sheetTitleRow}>
-              <Text style={signInStyles.sheetTitle}>
-                {resetSent ? "Check your email" : "Reset your password"}
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel="Close"
-                onPress={() => {
-                  setResetOpen(false);
-                  setResetSent(false);
-                }}
-                style={signInStyles.closeButton}
-              >
-                <Text style={signInStyles.closeText}>×</Text>
-              </Pressable>
-            </View>
+            {!resetSent && <View style={signInStyles.sheetTitleRow}><Text style={signInStyles.sheetTitle}>Forgot password</Text><Pressable accessibilityRole="button" accessibilityLabel="Close" onPress={() => { setResetOpen(false); setResetSent(false); }} style={signInStyles.closeButton}><Text style={signInStyles.closeText}>×</Text></Pressable></View>}
             {resetSent ? (
               <>
-                <Text style={signInStyles.sheetSubtitle}>
-                  The link lasts 30 minutes. If it does not arrive,{`\n`}check
-                  your junk folder.
-                </Text>
-                <View style={signInStyles.emailSuccess}>
-                  <View style={signInStyles.envelope}>
-                    <View style={signInStyles.envelopeFoldLeft} />
-                    <View style={signInStyles.envelopeFoldRight} />
-                  </View>
-                  <View style={signInStyles.checkBadge}>
-                    <Text style={signInStyles.checkMark}>✓</Text>
-                  </View>
-                </View>
+                <View style={signInStyles.resetSuccessIcon}><Text style={signInStyles.resetSuccessCheck}>✓</Text></View>
+                <Text style={signInStyles.resetSuccessTitle}>Check your email</Text>
+                <Text style={signInStyles.resetSuccessText}>We sent a link to {resetEmail}. It{`\n`}stays valid for 30 minutes.</Text>
                 <Button
                   label="Back to sign in"
-                  tone="secondary"
-                  accentOutline
                   onPress={() => {
                     setResetOpen(false);
                     setResetSent(false);
@@ -230,18 +250,20 @@ function SignInStandalone() {
             ) : (
               <>
                 <Text style={signInStyles.sheetSubtitle}>
-                  We will send a link to the email on your account.
+                  We will send a reset link to the address your operator has on file.
                 </Text>
                 <Field
                   label="Email"
                   labelStyle={signInStyles.fieldLabel}
-                  value={email}
-                  onChangeText={setEmail}
+                  value={resetEmail}
+                  onChangeText={setResetEmail}
+                  placeholder="Enter your email"
                   autoCapitalize="none"
                   keyboardType="email-address"
                 />
                 <Button
                   label="Send reset link"
+                  disabled={!resetEmail.trim()}
                   onPress={() => setResetSent(true)}
                 />
               </>
@@ -253,40 +275,460 @@ function SignInStandalone() {
   );
 }
 
+function AccountFieldInput({
+    label,
+    value,
+    onChangeText,
+    placeholder,
+    style,
+    keyboardType,
+  }: {
+    label: string;
+    value: string;
+    onChangeText: (text: string) => void;
+    placeholder?: string;
+    style?: object;
+    keyboardType?: "default" | "phone-pad";
+  }) {
+  return (
+    <View style={[accountStyles.field, style]}>
+      <Text style={accountStyles.label}>{label}</Text>
+      <TextInput
+        value={value}
+        onChangeText={onChangeText}
+        placeholder={placeholder}
+        placeholderTextColor="#94A3B8"
+        keyboardType={keyboardType}
+        style={accountStyles.input}
+      />
+    </View>
+  );
+}
+
+function AccountCreationStandalone() {
+  const [name, setName] = useState("");
+  const [mobile, setMobile] = useState("");
+  const [email, setEmail] = useState("");
+  const [licence, setLicence] = useState("");
+  const [licenceClass, setLicenceClass] = useState("");
+  const [state, setState] = useState("");
+
+  return (
+    <SafeAreaView style={accountStyles.safe} edges={["top", "left", "right"]}>
+      <View style={accountStyles.header}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Back to sign in"
+          onPress={() => router.back()}
+          style={accountStyles.backButton}
+        >
+          <Text style={accountStyles.back}>‹</Text>
+        </Pressable>
+        <View>
+          <Text style={accountStyles.title}>Create an account</Text>
+          <Text style={accountStyles.subtitle}>Yours, not an operator's</Text>
+        </View>
+      </View>
+      <ScrollView contentContainerStyle={accountStyles.content} keyboardShouldPersistTaps="handled">
+        <View style={accountStyles.notice}>
+          <Text style={accountStyles.noticeIcon}>i</Text>
+          <Text style={accountStyles.noticeText}>
+            Your account and your documents belong to you. Operators are added afterwards, one at a time, and each only sees what you allow.
+          </Text>
+        </View>
+        <AccountFieldInput label="Full name" value={name} onChangeText={setName} placeholder="Enter your full name" />
+        <AccountFieldInput label="Mobile" value={mobile} onChangeText={setMobile} placeholder="Enter your mobile number" keyboardType="phone-pad" />
+        <AccountFieldInput label="Email" value={email} onChangeText={setEmail} placeholder="Enter your email" />
+        <View style={accountStyles.licenceRow}>
+          <AccountFieldInput label="Licence number" value={licence} onChangeText={setLicence} placeholder="Enter number" style={accountStyles.licenceNumber} />
+          <AccountFieldInput label="Class" value={licenceClass} onChangeText={setLicenceClass} placeholder="e.g. MC" style={accountStyles.licenceClass} />
+        </View>
+        <AccountFieldInput label="State of issue" value={state} onChangeText={setState} placeholder="Enter state" />
+        <Pressable
+          accessibilityRole="button"
+          disabled={!name.trim() || !mobile.trim() || !email.trim() || !licence.trim() || !licenceClass.trim() || !state.trim()}
+          onPress={() => go("A38")}
+          style={({ pressed }) => [accountStyles.continue, (!name.trim() || !mobile.trim() || !email.trim() || !licence.trim() || !licenceClass.trim() || !state.trim()) && accountStyles.continueDisabled, pressed && { opacity: 0.8 }]}
+        >
+          <Text style={accountStyles.continueText}>Continue to your documents</Text>
+        </Pressable>
+        <Text style={accountStyles.helpText}>
+          FleetSync checks your licence against VicRoads before any operator can allocate you work.
+        </Text>
+      </ScrollView>
+    </SafeAreaView>
+  );
+}
+
+const accountStyles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#FFFFFF" },
+  header: {
+    minHeight: 50,
+    paddingHorizontal: 18,
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+    borderBottomWidth: 1,
+    borderColor: colors.border,
+  },
+  backButton: { width: 28, height: 38, justifyContent: "center" },
+  back: { color: colors.ink, fontSize: 30, lineHeight: 32, fontWeight: "300" },
+  title: { color: colors.ink, fontSize: 22, lineHeight: 25, fontFamily: "BarlowSemiCondensed_700Bold" },
+  subtitle: { color: colors.muted, fontSize: 13, lineHeight: 16 },
+  content: { paddingHorizontal: 18, paddingTop: 16, paddingBottom: 20, gap: 11 },
+  notice: {
+    borderRadius: 14,
+    padding: 14,
+    flexDirection: "row",
+    gap: 12,
+    backgroundColor: "#EEF4FC",
+  },
+  noticeIcon: {
+    width: 22,
+    height: 22,
+    borderRadius: 11,
+    borderWidth: 2,
+    borderColor: colors.actionBlue,
+    color: colors.actionBlue,
+    fontSize: 14,
+    fontWeight: "700",
+    textAlign: "center",
+    lineHeight: 18,
+  },
+  noticeText: { flex: 1, color: colors.ink, fontSize: 13, lineHeight: 19 },
+  field: { gap: 5 },
+  label: { color: colors.muted, fontSize: 10, fontWeight: "700", letterSpacing: 1, textTransform: "uppercase" },
+  input: {
+    height: 52,
+    borderRadius: 11,
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingHorizontal: 16,
+    color: colors.ink,
+    fontSize: 16,
+  },
+  licenceRow: { flexDirection: "row", gap: 10 },
+  licenceNumber: { flex: 1 },
+  licenceClass: { width: 96 },
+  continue: { height: 58, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: colors.actionBlue, marginTop: 2 },
+  continueDisabled: { opacity: .42 },
+  continueText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
+  helpText: { color: colors.muted, fontSize: 12, lineHeight: 17, textAlign: "center", paddingHorizontal: 4 },
+});
+
+const fileDocuments = [
+  ["A38.L", "Heavy vehicle licence, MC", "Expires 1 August 2026", "✓  MATCHED WITH VICROADS", "good"],
+  ["A38.M", "NHVR medical certificate", "Valid to 4 February 2027", "✓  CHECKED BY FLEETSYNC", "blue"],
+  ["A38.F", "Fatigue accreditation, BFM", "Confirmed by Redgum Freightlines", "✓  CONFIRMED BY EMPLOYER", "good"],
+  ["A38.D", "Dangerous goods licence", "Expired 2 July 2026", "EXPIRED", "bad"],
+  ["A38.V", "Work rights, VEVO check", "Submitted 6 July, check running", "◷  BEING CHECKED", "warn"],
+  ["A38.T", "Tanker safety induction", "Required by Barwon Fuel Haulage, not supplied", "⇧  TAP TO UPLOAD", "outline"],
+] as const;
+
+function FileHeader({ title, subtitle, share }: { title: string; subtitle: string; share?: boolean }) {
+  return <View style={fileStyles.header}><Pressable onPress={() => router.back()} style={fileStyles.backButton}><Text style={fileStyles.back}>‹</Text></Pressable><View style={fileStyles.headerCopy}><Text style={fileStyles.headerTitle}>{title}</Text><Text style={fileStyles.headerSub}>{subtitle}</Text></View>{share && <Pressable accessibilityRole="button" accessibilityLabel="Share document" style={fileStyles.shareButton}><MaterialIcons name="ios-share" size={25} color="#2563EB" /></Pressable>}</View>;
+}
+
+function YourFileStandalone() {
+  const [tankerUploadOpen, setTankerUploadOpen] = useState(false);
+  return <SafeAreaView style={fileStyles.safe} edges={["top", "left", "right"]}>
+    <FileHeader title="Your file" subtitle="3 verified, 1 checking, 1 expired, 1 missing" />
+    <ScrollView style={fileStyles.body} contentContainerStyle={fileStyles.fileListContent} showsVerticalScrollIndicator={false}>
+      <View style={fileStyles.listCard}>{fileDocuments.map(([id, title, detail, status, tone], index) => <Pressable key={id} onPress={() => id === "A38.T" ? setTankerUploadOpen(true) : go(id)} style={[fileStyles.docRow, index ? fileStyles.docBorder : null]}><View style={{ flex: 1 }}><Text style={fileStyles.docTitle}>{title}</Text><Text style={fileStyles.docDetail}>{detail}</Text><Text style={[fileStyles.pill, fileStyles[`pill${tone[0].toUpperCase()}${tone.slice(1)}` as "pillGood"]]}>{status}</Text></View><Text style={fileStyles.chevron}>›</Text></Pressable>)}</View>
+      <Pressable onPress={() => go("A38.C")} style={fileStyles.fileListPrimary}><Text style={fileStyles.primaryText}>Check my compliance</Text></Pressable>
+    </ScrollView>
+    <DocumentUploadSheet visible={tankerUploadOpen} title="Tanker safety induction" onClose={() => setTankerUploadOpen(false)} />
+  </SafeAreaView>;
+}
+
+function ComplianceStandalone() {
+  const [replaceOpen, setReplaceOpen] = useState(false);
+  return <SafeAreaView style={fileStyles.safe} edges={["top", "left", "right"]}>
+    <View style={complianceStyles.header}><Pressable onPress={() => router.back()} style={fileStyles.backButton}><Text style={fileStyles.back}>‹</Text></Pressable><View style={fileStyles.headerCopy}><Text style={fileStyles.headerTitle}>My compliance</Text><Text style={fileStyles.headerSub}>Checked 11:41 today</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Compliance help" style={complianceStyles.help}><Text style={complianceStyles.helpText}>?</Text></Pressable></View>
+    <ScrollView style={fileStyles.body} contentContainerStyle={complianceStyles.content} showsVerticalScrollIndicator={false}>
+      <View style={[complianceStyles.summary, complianceStyles.cleared]}><View style={[complianceStyles.summaryIcon, complianceStyles.clearedIcon]}><Text style={complianceStyles.summaryIconText}>✓</Text></View><View style={fileStyles.flexOne}><Text style={complianceStyles.summaryTitle}>Cleared for general freight</Text><Text style={[complianceStyles.summaryDetail, complianceStyles.clearedText]}>Redgum Freightlines can allocate you work today.</Text></View></View>
+      <View style={[complianceStyles.summary, complianceStyles.blocked]}><View style={[complianceStyles.summaryIcon, complianceStyles.blockedIcon]}><Text style={complianceStyles.summaryIconText}>×</Text></View><View style={fileStyles.flexOne}><Text style={complianceStyles.summaryTitle}>Blocked for dangerous{`\n`}goods</Text><Text style={[complianceStyles.summaryDetail, complianceStyles.blockedText]}>Your DG licence expired on 2 July, so tanker work at Barwon Fuel Haulage stays closed.</Text></View></View>
+      <View style={complianceStyles.documentCard}>{fileDocuments.map(([id, title, detail], index) => { const tone = index < 3 ? "good" : index === 3 ? "bad" : index === 4 ? "warn" : "upload"; return <Pressable key={id} onPress={() => id === "A38.T" ? go("A38") : go(id)} style={[complianceStyles.documentRow, index > 0 && complianceStyles.documentRule]}><View style={[complianceStyles.rowIcon, tone === "good" ? complianceStyles.rowGood : tone === "bad" ? complianceStyles.rowBad : tone === "warn" ? complianceStyles.rowWarn : complianceStyles.rowUpload]}><Text style={[complianceStyles.rowIconText, tone === "bad" && complianceStyles.rowBadText, tone === "warn" && complianceStyles.rowWarnText, tone === "upload" && complianceStyles.rowUploadText]}>{tone === "good" ? "✓" : tone === "bad" ? "×" : tone === "warn" ? "◷" : "↥"}</Text></View><View style={fileStyles.flexOne}><Text style={complianceStyles.documentTitle}>{title}</Text><Text style={complianceStyles.documentDetail}>{detail}</Text></View><Text style={fileStyles.chevron}>›</Text></Pressable>})}</View>
+      <Pressable onPress={() => go("A38.S")} style={complianceStyles.share}><Text style={complianceStyles.shareText}>Share my file with an employer</Text></Pressable>
+      <Pressable onPress={() => setReplaceOpen(true)} style={complianceStyles.replaceLicence}><Text style={complianceStyles.replaceLicenceText}>Replace the expired licence</Text></Pressable>
+    </ScrollView>
+    <DocumentUploadSheet visible={replaceOpen} title="Work rights, VEVO check" onClose={() => setReplaceOpen(false)} />
+  </SafeAreaView>;
+}
+
+const qrRows = Array.from({ length: 21 }, (_, row) =>
+  Array.from({ length: 21 }, (_, column) => {
+    const finder = (top: number, left: number) => {
+      const y = row - top;
+      const x = column - left;
+      if (x < 0 || x > 6 || y < 0 || y > 6) return false;
+      return x === 0 || x === 6 || y === 0 || y === 6 || (x >= 2 && x <= 4 && y >= 2 && y <= 4);
+    };
+    if (finder(0, 0) || finder(0, 14) || finder(14, 0)) return "1";
+    const inFinderArea = (row <= 7 && (column <= 7 || column >= 13)) || (row >= 13 && column <= 7);
+    if (inFinderArea) return "0";
+    return ((row * 7 + column * 11 + row * column) % 5 < 2 || (row + column) % 9 === 0) ? "1" : "0";
+  }).join("")
+);
+
+function ShareFileStandalone() {
+  const [duration, setDuration] = useState<"24 hours" | "7 days" | "Until I revoke it">("Until I revoke it");
+  const [copied, setCopied] = useState(false);
+  return <SafeAreaView style={fileStyles.safe} edges={["top", "left", "right"]}>
+    <View style={complianceStyles.header}><Pressable onPress={() => router.back()} style={fileStyles.backButton}><Text style={fileStyles.back}>‹</Text></Pressable><View style={fileStyles.headerCopy}><Text style={fileStyles.headerTitle}>Share my file</Text></View><Pressable accessibilityRole="button" accessibilityLabel="Sharing help" style={complianceStyles.help}><Text style={complianceStyles.helpText}>?</Text></Pressable></View>
+    <ScrollView style={fileStyles.body} contentContainerStyle={shareStyles.content} showsVerticalScrollIndicator={false}>
+      <View style={shareStyles.qrCard}><View style={shareStyles.qr}>{qrRows.map((row, rowIndex) => <View key={rowIndex} style={shareStyles.qrRow}>{row.split("").map((bit, columnIndex) => <View key={columnIndex} style={[shareStyles.qrCell, bit === "1" && shareStyles.qrCellOn]}/>)}</View>)}</View><Text style={shareStyles.qrHelp}>Hold this up at the gate or in an interview. It opens your verified file, nothing else.</Text></View>
+      <View style={shareStyles.linkCard}><Text style={shareStyles.label}>LINK</Text><Text style={shareStyles.link}>fleetsync.com.au/file/dw-042118663</Text><Text style={[shareStyles.label, shareStyles.durationLabel]}>STAYS OPEN FOR</Text><View style={shareStyles.segment}>{(["24 hours", "7 days", "Until I revoke it"] as const).map(option => <Pressable key={option} onPress={() => setDuration(option)} style={[shareStyles.segmentOption, duration === option && shareStyles.segmentSelected]}><Text style={[shareStyles.segmentText, duration === option && shareStyles.segmentSelectedText]}>{option}</Text></Pressable>)}</View></View>
+      <View style={shareStyles.historyCard}><View style={shareStyles.historyRow}><Image source={require("../../../../assets/driver-profile.png")} style={shareStyles.historyAvatar}/><Text style={shareStyles.historyName}>Kate Ryan opened it</Text><Text style={shareStyles.historyDate}>6 July</Text></View><View style={shareStyles.historyRule}/><View style={shareStyles.historyRow}><View style={shareStyles.historyCompany}><Text style={shareStyles.historyCompanyText}>BF</Text></View><Text style={shareStyles.historyName}>Barwon Fuel Haulage opened it</Text><Text style={shareStyles.historyDate}>1 July</Text></View></View>
+      <Pressable onPress={() => setCopied(true)} style={shareStyles.copyButton}><Text style={shareStyles.copyButtonText}>{copied ? "Link copied" : "Copy the link"}</Text></Pressable>
+    </ScrollView>
+  </SafeAreaView>;
+}
+
+function DocumentUploadSheet({ visible, title, onClose }: { visible: boolean; title: string; onClose: () => void }) {
+  return <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}><View style={fileStyles.modalRoot}><Pressable accessibilityLabel="Close upload options" style={fileStyles.scrim} onPress={onClose}/><View style={fileStyles.uploadSheet}><View style={fileStyles.handle}/><Text style={fileStyles.uploadSheetTitle}>{title}</Text><Text style={fileStyles.uploadSheetSub}>Choose how to add it. FleetSync checks it, then matches it against the issuing authority where one exists.</Text>{["Photograph the document", "Choose a file on this phone", "Import from Service Victoria", "Ask the operator to send it"].map(option => <Pressable key={option} style={fileStyles.uploadOption} onPress={onClose}><Text style={fileStyles.uploadOptionText}>{option}</Text><Text style={fileStyles.uploadChevron}>›</Text></Pressable>)}</View></View></Modal>;
+}
+
+function DocumentDetailStandalone({ id }: { id: string }) {
+  const doc = fileDocuments.find(([docId]) => docId === id)!;
+  const isExpired = id === "A38.D";
+  const isChecking = id === "A38.V";
+  const [replaceOpen, setReplaceOpen] = useState(false);
+  const status = isExpired ? "Expired" : isChecking ? "Being checked" : "Verification history";
+  return <SafeAreaView style={fileStyles.safe} edges={["top", "left", "right"]}>
+    <FileHeader title={doc[1]} subtitle={status} share={["A38.L", "A38.M", "A38.F"].includes(id)} />
+    <ScrollView style={fileStyles.body} contentContainerStyle={[fileStyles.content, (isExpired || ["A38.L", "A38.M", "A38.F", "A38.V"].includes(id)) && fileStyles.expiredContent]} showsVerticalScrollIndicator={false}>
+      {isExpired ? <ExpiredDocumentContent /> : id === "A38.L" ? <VerifiedLicenceContent /> : id === "A38.M" ? <VerifiedMedicalContent /> : id === "A38.F" ? <VerifiedFatigueContent /> : id === "A38.V" ? <CheckingWorkRightsContent /> : <>
+        <View style={[fileStyles.statusCard, isChecking ? fileStyles.checking : fileStyles.verified]}><Text style={fileStyles.statusTitle}>{isChecking ? "◷  Being checked now" : "✓  Verified and current"}</Text><Text style={fileStyles.statusText}>{isChecking ? "Usually clears by the next business day." : "Nothing for you to do on this one."}</Text></View>
+        <View style={fileStyles.infoCard}><Text style={fileStyles.docTitle}>{doc[1].toUpperCase()}</Text><Text style={fileStyles.docDetail}>{id === "A38.L" ? "042 118 663  ·  Class MC" : "Document verified by FleetSync"}</Text><View style={fileStyles.infoRule}/><View style={fileStyles.issuedRow}><Text style={fileStyles.docDetail}>ISSUED    02/08/2018     EXPIRES    01/08/2026</Text></View></View>
+        <View style={fileStyles.infoCard}><Text style={fileStyles.sectionTitle}>{isChecking ? "WHERE IT IS UP TO" : "WHO HAS CHECKED THIS"}</Text><Text style={fileStyles.checkLine}>✓   {isChecking ? "Uploaded by you" : "Matched with VicRoads"}</Text><Text style={fileStyles.checkDetail}>    Image is legible, name matches your account.</Text><Text style={fileStyles.checkLine}>✓   Checked by FleetSync</Text><Text style={fileStyles.checkDetail}>    12 June 2026, 16:44</Text></View>
+      </>}
+      {isChecking ? <><View style={fileStyles.runNotice}><Text style={fileStyles.runTitle}>WHILE THIS RUNS</Text><Text style={fileStyles.runText}>✓   You can keep working. Nothing is blocked today.</Text><Text style={fileStyles.runMuted}>ⓘ   If it fails, we tell you what to send instead.{"\n"}     Nobody is notified of a failure except you.</Text></View><Pressable style={fileStyles.primary}><Text style={fileStyles.primaryText}>Tell me when it clears</Text></Pressable><Pressable onPress={() => setReplaceOpen(true)} style={fileStyles.replace}><Text style={fileStyles.replaceText}>Send a clearer copy</Text></Pressable></> : <><Pressable onPress={() => setReplaceOpen(true)} style={[fileStyles.replace, isExpired && fileStyles.replaceExpired]}><Text style={[fileStyles.replaceText, isExpired && { color: "#fff"}]}>{isExpired ? "Upload the renewed licence" : "Replace this document"}</Text></Pressable>{isExpired && <Pressable style={fileStyles.replace}><Text style={fileStyles.replaceText}>How to renew it</Text></Pressable>}</>}
+    </ScrollView>
+    <Modal visible={replaceOpen} transparent animationType="slide" onRequestClose={() => setReplaceOpen(false)}><View style={fileStyles.modalRoot}><Pressable style={fileStyles.scrim} onPress={() => setReplaceOpen(false)}/><View style={fileStyles.sheet}><View style={fileStyles.handle}/><Text style={fileStyles.sheetTitle}>{doc[1]}</Text><Text style={fileStyles.sheetSub}>Choose how to add it. FleetSync checks it, then matches it against the issuing authority where one exists.</Text>{["Photograph the document", "Choose a file on this phone", "Import from Service Victoria", "Ask the operator to send it"].map(option => <Pressable key={option} style={fileStyles.option} onPress={() => setReplaceOpen(false)}><Text style={fileStyles.optionText}>{option}</Text><Text style={fileStyles.chevron}>›</Text></Pressable>)}</View></View></Modal>
+  </SafeAreaView>;
+}
+
+function VerifiedLicenceContent() {
+  return <>
+    <View style={[fileStyles.statusCard, fileStyles.verifiedBanner]}>
+      <View style={fileStyles.verifiedIcon}><Text style={fileStyles.verifiedIconText}>✓</Text></View>
+      <View style={fileStyles.flexOne}><Text style={[fileStyles.statusTitle, fileStyles.verifiedTitle]}>Verified and current</Text><Text style={[fileStyles.statusText, fileStyles.verifiedDetail]}>Nothing for you to do on this one.</Text></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.verifiedLicenceCard]}>
+      <View style={fileStyles.licenceHeading}><View style={fileStyles.flexOne}><Text style={fileStyles.verifiedLicenceTitle}>VICTORIA DRIVER LICENCE</Text><Text style={fileStyles.licenceNumber}>042 118 663 · Class MC</Text></View><Image source={require("../../../../assets/driver-profile.png")} style={fileStyles.verifiedLicencePhoto} /></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.verifiedDates}><View style={fileStyles.verifiedDateColumn}><Text style={fileStyles.dateLabel}>ISSUED</Text><Text style={fileStyles.verifiedDateValue}>02/08/2018</Text></View><View style={fileStyles.verifiedDateColumn}><Text style={fileStyles.dateLabel}>EXPIRES</Text><Text style={fileStyles.verifiedDateValue}>01/08/2026</Text></View><View style={fileStyles.issuerColumn}><Text style={fileStyles.dateLabel}>ISSUED BY</Text><Text style={fileStyles.issuerValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.78}>VicRoads, Victoria</Text></View></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.historyCard]}>
+      <Text style={fileStyles.sectionTitle}>WHO HAS CHECKED THIS</Text>
+      <VerificationRow tone="green" title="Matched with VicRoads" detail={'Number, class and expiry agree with the\nregister. Rechecked nightly.'} date="13 June 2026, 02:10" />
+      <VerificationRow tone="blue" title="Checked by FleetSync" detail={'Image is legible, name matches your account,\nno signs of alteration.'} date="12 June 2026, 16:44" compactDetail />
+      <VerificationRow tone="pending" title="Uploaded by you" date="12 June 2026, 16:41" />
+    </View>
+    <View style={fileStyles.expiryWarning}><MaterialIcons name="schedule" size={20} color="#C44C00"/><Text style={fileStyles.expiryWarningText}>Expires in 24 days. Replace it before 1 August or Redgum Freightlines cannot allocate you work.</Text></View>
+  </>;
+}
+
+function VerifiedMedicalContent() {
+  return <>
+    <View style={[fileStyles.statusCard, fileStyles.verifiedBanner]}>
+      <View style={fileStyles.verifiedIcon}><Text style={fileStyles.verifiedIconText}>✓</Text></View>
+      <View style={fileStyles.flexOne}><Text style={[fileStyles.statusTitle, fileStyles.verifiedTitle]}>Verified and current</Text><Text style={[fileStyles.statusText, fileStyles.verifiedDetail]}>Nothing for you to do on this one.</Text></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.medicalCard]}>
+      <View style={fileStyles.licenceHeading}><View style={fileStyles.flexOne}><Text style={fileStyles.verifiedLicenceTitle}>HEAVY VEHICLE MEDICAL</Text><Text style={fileStyles.licenceNumber}>MED-70412</Text></View><Image source={require("../../../../assets/driver-profile.png")} style={fileStyles.medicalPhoto} /></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.medicalDates}><View style={fileStyles.medicalDateColumn}><Text style={fileStyles.dateLabel}>ISSUED</Text><Text style={fileStyles.verifiedDateValue}>05/02/2025</Text></View><View style={fileStyles.medicalDateColumn}><Text style={fileStyles.dateLabel}>EXPIRES</Text><Text style={fileStyles.verifiedDateValue}>04/02/2027</Text></View><View style={fileStyles.medicalIssuerColumn}><Text style={fileStyles.dateLabel}>ISSUED BY</Text><Text style={fileStyles.issuerValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.75}>Dr A Kaur, Werribee</Text></View></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.medicalHistoryCard]}>
+      <Text style={fileStyles.sectionTitle}>WHO HAS CHECKED THIS</Text>
+      <VerificationRow tone="blue" title="Checked by FleetSync" detail={'Image is legible, name matches your account,\nno signs of alteration.'} date="12 June 2026, 16:44" compactDetail />
+      <VerificationRow tone="pending" title="Uploaded by you" date="12 June 2026, 16:41" />
+    </View>
+  </>;
+}
+
+function VerifiedFatigueContent() {
+  return <>
+    <View style={[fileStyles.statusCard, fileStyles.verifiedBanner]}>
+      <View style={fileStyles.verifiedIcon}><Text style={fileStyles.verifiedIconText}>✓</Text></View>
+      <View style={fileStyles.flexOne}><Text style={[fileStyles.statusTitle, fileStyles.verifiedTitle]}>Verified and current</Text><Text style={[fileStyles.statusText, fileStyles.verifiedDetail]}>Nothing for you to do on this one.</Text></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.medicalCard]}>
+      <View style={fileStyles.licenceHeading}><View style={fileStyles.flexOne}><Text style={fileStyles.verifiedLicenceTitle}>BASIC FATIGUE MANAGEMENT</Text><Text style={fileStyles.licenceNumber}>BFM-31188</Text></View><Image source={require("../../../../assets/driver-profile.png")} style={fileStyles.medicalPhoto} /></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.medicalDates}><View style={fileStyles.medicalDateColumn}><Text style={fileStyles.dateLabel}>ISSUED</Text><Text style={fileStyles.verifiedDateValue}>06/07/2026</Text></View><View style={fileStyles.medicalDateColumn}><Text style={fileStyles.dateLabel}>EXPIRES</Text><Text style={fileStyles.verifiedDateValue}>30/06/2027</Text></View><View style={fileStyles.medicalIssuerColumn}><Text style={fileStyles.dateLabel}>ISSUED BY</Text><Text style={fileStyles.issuerValue} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>Redgum Freightlines</Text></View></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.historyCard]}>
+      <Text style={fileStyles.sectionTitle}>WHO HAS CHECKED THIS</Text>
+      <VerificationRow tone="teal" title="Confirmed by employer" detail={'Kate Ryan sighted the original at the Laverton\ndepot and signed for it.'} date="6 July 2026, 07:20" compactDetail />
+      <VerificationRow tone="blue" title="Checked by FleetSync" detail={'Image is legible, name matches your account,\nno signs of alteration.'} date="12 June 2026, 16:44" compactDetail />
+      <VerificationRow tone="pending" title="Uploaded by you" date="12 June 2026, 16:41" />
+    </View>
+  </>;
+}
+
+function CheckingWorkRightsContent() {
+  return <>
+    <View style={[fileStyles.statusCard, fileStyles.checkingBanner]}>
+      <View style={fileStyles.progressRing}><View style={fileStyles.progressRingCutout}/></View>
+      <View style={fileStyles.flexOne}><Text style={fileStyles.checkingTitle}>Being checked now</Text><Text style={fileStyles.checkingDetail}>Usually clears by the next business day.</Text></View>
+    </View>
+    <View style={fileStyles.vevoCard}>
+      <View style={fileStyles.vevoHeading}><View style={fileStyles.flexOne}><Text style={fileStyles.verifiedLicenceTitle}>WORK RIGHTS, VEVO</Text><Text style={fileStyles.licenceNumber}>VEVO-4419</Text></View><Text style={fileStyles.notVerifiedPill}>NOT VERIFIED YET</Text></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.vevoDates}><View><Text style={fileStyles.dateLabel}>SUBMITTED</Text><Text style={fileStyles.verifiedDateValue}>06/07/2026</Text></View><View><Text style={fileStyles.dateLabel}>VALID</Text><Text style={fileStyles.vevoValid}>While the visa holds</Text></View></View>
+      <Text style={fileStyles.vevoPrivacy}>Checked against Department of Home Affairs. Nothing you send is visible to an operator until it clears.</Text>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.vevoProgressCard]}>
+      <Text style={fileStyles.sectionTitle}>WHERE IT IS UP TO</Text>
+      <VerificationRow tone="green" title="Uploaded by you" date="6 July 2026, 09:04" />
+      <VerificationRow tone="blue" title="Checked by FleetSync" detail="Legible, name matches your account." date="6 July 2026, 09:06" />
+      <View style={fileStyles.verificationRow}><View style={fileStyles.waitingRing}><View style={fileStyles.waitingRingCutout}/></View><View style={fileStyles.flexOne}><Text style={fileStyles.waitingTitle}>Waiting on Department of Home Affairs</Text><Text style={fileStyles.verificationDetail}>The register answers in business hours. We{`\n`}retry every 30 minutes.</Text></View></View>
+      <View style={fileStyles.verificationRow}><View style={[fileStyles.verificationIcon, fileStyles.verificationPending]}/><Text style={[fileStyles.verificationTitle, fileStyles.pendingTitle]}>Added to your verified file</Text></View>
+    </View>
+  </>;
+}
+
+function VerificationRow({ tone, title, detail, date, compactDetail = false }: { tone: "green" | "teal" | "blue" | "pending"; title: string; detail?: string; date: string; compactDetail?: boolean }) {
+  const pending = tone === "pending";
+  return <View style={fileStyles.verificationRow}><View style={[fileStyles.verificationIcon, tone === "green" ? fileStyles.verificationGreen : tone === "teal" ? fileStyles.verificationTeal : tone === "blue" ? fileStyles.verificationBlue : fileStyles.verificationPending]}>{!pending && <Text style={fileStyles.verificationCheck}>✓</Text>}</View><View style={fileStyles.flexOne}><Text style={[fileStyles.verificationTitle, pending && fileStyles.pendingTitle]}>{title}</Text>{detail && <Text style={[fileStyles.verificationDetail, compactDetail && fileStyles.compactVerificationDetail]}>{detail}</Text>}<Text style={fileStyles.verificationDate}>{date}</Text></View></View>;
+}
+
+function ExpiredDocumentContent() {
+  return <>
+    <View style={[fileStyles.statusCard, fileStyles.expiredBanner]}>
+      <View style={fileStyles.expiredIcon}><Text style={fileStyles.expiredIconText}>×</Text></View>
+      <View style={fileStyles.flexOne}><Text style={[fileStyles.statusTitle, fileStyles.expiredText]}>Expired 6 days ago</Text><Text style={[fileStyles.statusText, fileStyles.expiredText]}>02/07/2026. It no longer counts towards your file.</Text></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.licenceCard]}>
+      <View style={fileStyles.licenceHeading}><View style={fileStyles.flexOne}><Text style={[fileStyles.docTitle, fileStyles.licenceTitle]}>DANGEROUS GOODS LICENCE</Text><Text style={fileStyles.docDetail}>DG-88420</Text><Text style={fileStyles.docDetail}>Issued by WorkSafe Victoria</Text></View><Image source={require("../../../../assets/driver-profile.png")} style={fileStyles.licencePhoto} /></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.licenceDates}><View><Text style={fileStyles.dateLabel}>ISSUED</Text><Text style={fileStyles.dateValue}>03/07/2023</Text></View><View><Text style={fileStyles.dateLabel}>EXPIRED</Text><Text style={[fileStyles.dateValue, fileStyles.expiryDate]}>02/07/2026</Text></View><Text style={fileStyles.expiredStamp}>EXPIRED</Text></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.detailCard]}>
+      <Text style={fileStyles.sectionTitle}>WHAT THIS BLOCKS</Text>
+      <View style={fileStyles.impactRow}><View style={[fileStyles.roundIcon, fileStyles.badIcon]}><Text style={fileStyles.badIconText}>×</Text></View><View style={fileStyles.flexOne}><Text style={fileStyles.checkLine}>Tanker and placarded loads</Text><Text style={[fileStyles.checkDetail, fileStyles.badDetail]}>Barwon Fuel Haulage cannot allocate you a tanker</Text></View></View>
+      <View style={[fileStyles.infoRule, fileStyles.indentedRule]}/>
+      <View style={fileStyles.impactRow}><View style={[fileStyles.roundIcon, fileStyles.goodIcon]}><Text style={fileStyles.goodIconText}>✓</Text></View><View style={fileStyles.flexOne}><Text style={fileStyles.checkLine}>General freight</Text><Text style={[fileStyles.checkDetail, fileStyles.goodDetail]}>Unaffected. Your Redgum run today still stands</Text></View></View>
+    </View>
+    <View style={[fileStyles.infoCard, fileStyles.toldCard]}>
+      <Text style={fileStyles.sectionTitle}>WHO HAS BEEN TOLD</Text>
+      <View style={fileStyles.personRow}><View style={fileStyles.companyAvatar}><Text style={fileStyles.companyAvatarText}>BF</Text></View><Text style={fileStyles.personName}>Barwon Fuel Haulage compliance</Text><Text style={fileStyles.personDate}>2 July</Text></View>
+      <View style={fileStyles.infoRule}/>
+      <View style={fileStyles.personRow}><Image source={require("../../../../assets/driver-profile.png")} style={fileStyles.personAvatar}/><Text style={fileStyles.personName}>Kate Ryan, Allocator</Text><Text style={fileStyles.personDate}>2 July</Text></View>
+    </View>
+    <View style={fileStyles.warning}><MaterialIcons name="info-outline" size={18} color="#DC2626"/><Text style={fileStyles.warningText}>Driving a placarded load on an expired licence is an offence under the Dangerous Goods Act. FleetSync will not let an operator allocate one.</Text></View>
+  </>;
+}
+
+const fileStyles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#FFFFFF" }, body: { backgroundColor: "#F4F6FA" }, header: { minHeight: 56, backgroundColor: "#fff", borderBottomWidth: 1, borderColor: colors.border, flexDirection: "row", alignItems: "center", paddingHorizontal: 22, gap: 18 }, headerCopy: { flex: 1 }, backButton: { width: 28, height: 36, justifyContent: "center" }, back: { fontSize: 29, lineHeight: 30, color: colors.ink }, shareButton: { width: 36, height: 36, alignItems: "center", justifyContent: "center" }, headerTitle: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 20, lineHeight: 23, color: colors.ink }, headerSub: { fontSize: 12, lineHeight: 16, color: colors.muted }, content: { padding: 18, gap: 18 }, fileListContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 34, gap: 16 }, expiredContent: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 28, gap: 16 }, listCard: { backgroundColor: "#fff", borderRadius: 20, paddingHorizontal: 18, shadowColor: colors.fleetNavy, shadowOpacity: .07, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, docRow: { minHeight: 104, flexDirection: "row", alignItems: "center", gap: 8 }, docBorder: { borderTopWidth: 1, borderColor: colors.border }, docTitle: { fontSize: 16, lineHeight: 20, fontWeight: "700", color: colors.ink }, docDetail: { fontSize: 13, lineHeight: 18, color: colors.muted, marginTop: 2 }, pill: { alignSelf: "flex-start", overflow: "hidden", borderRadius: 12, marginTop: 7, paddingHorizontal: 9, paddingVertical: 3, fontSize: 9, fontWeight: "700", letterSpacing: .7 }, pillGood: { backgroundColor: "#EAFBF1", color: "#12733D" }, pillBlue: { backgroundColor: "#EEF4FF", color: colors.actionBlue }, pillBad: { backgroundColor: "#FFF0F0", color: "#B91C1C" }, pillWarn: { backgroundColor: "#FFF6E9", color: "#B45309" }, pillOutline: { borderWidth: 1, borderStyle: "dashed", borderColor: "#94A3B8", color: colors.muted }, chevron: { fontSize: 27, color: "#94A3B8" }, primary: { height: 72, borderRadius: 14, justifyContent: "center", alignItems: "center", backgroundColor: colors.actionBlue }, fileListPrimary: { height: 60, borderRadius: 13, justifyContent: "center", alignItems: "center", backgroundColor: "#2D64E8" }, primaryText: { color: "#fff", fontSize: 16, fontWeight: "700" }, statusCard: { padding: 16, borderRadius: 15 }, verified: { backgroundColor: "#ECFDF3", borderWidth: 1, borderColor: "#A7F3C2" }, expiredText: { color: "#FFFFFF" }, checking: { backgroundColor: "#FFF7EA", borderWidth: 1, borderColor: "#F59E0B" }, statusTitle: { color: colors.ink, fontSize: 18, lineHeight: 22, fontWeight: "700" }, statusText: { color: colors.muted, fontSize: 14, lineHeight: 19, marginTop: 2 }, infoCard: { backgroundColor: "#fff", borderRadius: 16, padding: 18, gap: 7 }, infoRule: { height: 1, backgroundColor: colors.border, marginVertical: 8 }, issuedRow: { flexDirection: "row", alignItems: "center", justifyContent: "space-between" }, expiredStamp: { color: "#D22B2B", borderWidth: 2.5, borderColor: "#D22B2B", borderRadius: 6, paddingHorizontal: 8, paddingVertical: 4, fontSize: 17, fontWeight: "900", letterSpacing: 2.5, transform: [{ rotate: "-10deg" }] }, sectionTitle: { color: colors.muted, fontSize: 11, fontWeight: "700", letterSpacing: 1.2 }, checkLine: { color: colors.ink, fontSize: 16, lineHeight: 20, fontWeight: "700" }, checkDetail: { color: colors.muted, fontSize: 14, lineHeight: 19 }, warning: { padding: 16, borderRadius: 15, backgroundColor: "#FFF0EE", flexDirection: "row", alignItems: "flex-start", gap: 10 }, runNotice: { padding: 18, borderRadius: 16, backgroundColor: "#EEF4FC", gap: 10 }, runTitle: { color: colors.actionBlue, fontSize: 11, letterSpacing: 1, fontWeight: "700" }, runText: { color: colors.ink, fontSize: 15, lineHeight: 21 }, runMuted: { color: colors.muted, fontSize: 13, lineHeight: 19 }, replace: { height: 60, backgroundColor: "#fff", borderRadius: 13, borderWidth: 1, borderColor: colors.border, justifyContent: "center", alignItems: "center" }, replaceExpired: { backgroundColor: "#E5252A", borderColor: "#E5252A" }, replaceText: { color: colors.ink, fontSize: 16, fontWeight: "700" },
+  expiredBanner: { minHeight: 94, backgroundColor: "#E5252A", flexDirection: "row", alignItems: "center", gap: 14 }, expiredIcon: { width: 38, height: 38, borderRadius: 19, alignItems: "center", justifyContent: "center", backgroundColor: "rgba(255,255,255,.22)" }, expiredIconText: { color: "#fff", fontSize: 28, lineHeight: 30, fontWeight: "400" }, flexOne: { flex: 1 }, licenceCard: { minHeight: 160, padding: 20, gap: 8, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, licenceHeading: { flexDirection: "row", gap: 12 }, licenceTitle: { color: "#9299A3" }, licencePhoto: { width: 46, height: 58, borderRadius: 4, opacity: .5 }, licenceDates: { minHeight: 44, flexDirection: "row", alignItems: "flex-end", gap: 30 }, dateLabel: { color: "#C6CFDC", fontSize: 10, fontWeight: "700", letterSpacing: 1.1 }, dateValue: { color: "#707C8C", fontSize: 13, marginTop: 5, fontFamily: "monospace" }, expiryDate: { color: "#F08D91" }, detailCard: { padding: 20, gap: 10, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, impactRow: { flexDirection: "row", alignItems: "center", gap: 14 }, roundIcon: { width: 32, height: 32, borderRadius: 16, alignItems: "center", justifyContent: "center" }, badIcon: { backgroundColor: "#FFF0F0" }, goodIcon: { backgroundColor: "#EAFBF1" }, badIconText: { color: "#DC2626", fontSize: 22, lineHeight: 23 }, goodIconText: { color: "#16A34A", fontSize: 18, fontWeight: "700" }, badDetail: { color: "#B91C1C", marginTop: 3 }, goodDetail: { color: "#16733A", marginTop: 3 }, indentedRule: { marginLeft: 46, marginVertical: 0 }, toldCard: { padding: 20, gap: 10, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, personRow: { minHeight: 42, flexDirection: "row", alignItems: "center", gap: 12 }, companyAvatar: { width: 34, height: 34, borderRadius: 10, backgroundColor: "#0EA5A4", alignItems: "center", justifyContent: "center" }, companyAvatarText: { color: "#fff", fontSize: 12, fontWeight: "700" }, personAvatar: { width: 34, height: 34, borderRadius: 17 }, personName: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 18 }, personDate: { color: colors.muted, fontSize: 13, fontFamily: "monospace" }, warningText: { flex: 1, color: "#B91C1C", fontSize: 13, lineHeight: 19 },
+  verifiedBanner: { minHeight: 74, backgroundColor: "#ECFDF3", borderWidth: 1, borderColor: "#A7F3C2", flexDirection: "row", alignItems: "center", gap: 14 }, verifiedIcon: { width: 38, height: 38, borderRadius: 19, backgroundColor: "#18A957", alignItems: "center", justifyContent: "center" }, verifiedIconText: { color: "#fff", fontSize: 22, fontWeight: "800" }, verifiedTitle: { color: "#126B35", fontSize: 16 }, verifiedDetail: { color: "#397E51", fontSize: 13 }, verifiedLicenceCard: { minHeight: 174, padding: 20, gap: 10, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, verifiedLicenceTitle: { color: colors.ink, fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 18, lineHeight: 22 }, licenceNumber: { color: colors.muted, fontFamily: "monospace", fontSize: 13, marginTop: 4 }, verifiedLicencePhoto: { width: 48, height: 62, borderRadius: 4 }, verifiedDates: { flexDirection: "row", alignItems: "flex-start", gap: 20 }, verifiedDateColumn: { minWidth: 78 }, issuerColumn: { flex: 1 }, verifiedDateValue: { color: colors.ink, fontFamily: "monospace", fontSize: 13, fontWeight: "600", marginTop: 5 }, issuerValue: { color: colors.ink, fontSize: 13, fontWeight: "600", marginTop: 5 }, historyCard: { paddingVertical: 20, paddingHorizontal: 16, gap: 15, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, verificationRow: { flexDirection: "row", alignItems: "flex-start", gap: 12 }, verificationIcon: { width: 27, height: 27, borderRadius: 14, alignItems: "center", justifyContent: "center", marginTop: 1 }, verificationGreen: { backgroundColor: "#18A957" }, verificationTeal: { backgroundColor: "#17A8AA" }, verificationBlue: { backgroundColor: "#2D64E8" }, verificationPending: { backgroundColor: "#fff", borderWidth: 2, borderColor: "#D7E0EB" }, verificationCheck: { color: "#fff", fontSize: 16, fontWeight: "800" }, verificationTitle: { color: colors.ink, fontSize: 16, lineHeight: 20, fontWeight: "700" }, pendingTitle: { color: colors.muted }, verificationDetail: { color: colors.muted, fontSize: 13, lineHeight: 18, marginTop: 2 }, compactVerificationDetail: { fontSize: 12, letterSpacing: -0.05 }, verificationDate: { color: colors.muted, fontFamily: "monospace", fontSize: 12, lineHeight: 18, marginTop: 3 }, expiryWarning: { minHeight: 82, backgroundColor: "#FFF7E8", borderRadius: 15, padding: 16, flexDirection: "row", alignItems: "flex-start", gap: 12 }, expiryWarningText: { flex: 1, color: "#B84A00", fontSize: 13, lineHeight: 19 },
+  medicalCard: { minHeight: 166, padding: 20, gap: 10, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, medicalPhoto: { width: 48, height: 62, borderRadius: 4 }, medicalDates: { flexDirection: "row", alignItems: "flex-start", gap: 16 }, medicalDateColumn: { minWidth: 82 }, medicalIssuerColumn: { flex: 1 }, medicalHistoryCard: { paddingVertical: 20, paddingHorizontal: 16, gap: 18, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  checkingBanner: { minHeight: 76, backgroundColor: "#FFF8EB", borderWidth: 1, borderColor: "#F59E0B", flexDirection: "row", alignItems: "center", gap: 14 }, progressRing: { width: 38, height: 38, borderRadius: 19, borderWidth: 3, borderColor: "#FDE0A8", borderLeftColor: "#C65B00", borderBottomColor: "#C65B00", alignItems: "center", justifyContent: "center", transform: [{ rotate: "-18deg" }] }, progressRingCutout: { width: 25, height: 25, borderRadius: 13, backgroundColor: "#FFF8EB" }, checkingTitle: { color: colors.ink, fontSize: 16, lineHeight: 21, fontWeight: "700" }, checkingDetail: { color: "#C04D00", fontSize: 13, lineHeight: 18, marginTop: 2 }, vevoCard: { minHeight: 198, backgroundColor: "#fff", borderWidth: 1.5, borderStyle: "dashed", borderColor: "#91A5C0", borderRadius: 3, padding: 20, gap: 10 }, vevoHeading: { flexDirection: "row", alignItems: "flex-start", gap: 8 }, notVerifiedPill: { color: "#B84A00", backgroundColor: "#FFF5E8", borderRadius: 14, overflow: "hidden", paddingHorizontal: 9, paddingVertical: 5, fontSize: 9, fontWeight: "700", letterSpacing: .4 }, vevoDates: { flexDirection: "row", alignItems: "flex-start", gap: 42 }, vevoValid: { color: colors.ink, fontSize: 13, fontWeight: "600", marginTop: 5 }, vevoPrivacy: { color: colors.muted, fontSize: 13, lineHeight: 19, marginTop: 3 }, vevoProgressCard: { paddingVertical: 20, paddingHorizontal: 16, gap: 17, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } }, waitingRing: { width: 27, height: 27, borderRadius: 14, borderWidth: 2.5, borderColor: "#FDE0A8", borderLeftColor: "#C65B00", borderBottomColor: "#C65B00", alignItems: "center", justifyContent: "center", marginTop: 1 }, waitingRingCutout: { width: 17, height: 17, borderRadius: 9, backgroundColor: "#fff" }, waitingTitle: { color: "#B84A00", fontSize: 15, lineHeight: 20, fontWeight: "700" },
+  modalRoot: { flex: 1, justifyContent: "flex-end" }, scrim: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(15,27,42,.52)" }, uploadSheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, paddingHorizontal: 20, paddingTop: 12, paddingBottom: 28 }, uploadSheetTitle: { color: colors.ink, fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 22, lineHeight: 27 }, uploadSheetSub: { color: colors.muted, fontSize: 13, lineHeight: 18, marginTop: 5, marginBottom: 8 }, uploadOption: { minHeight: 60, borderBottomWidth: 1, borderColor: colors.border, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }, uploadOptionText: { color: colors.ink, fontSize: 16 }, uploadChevron: { color: "#94A3B8", fontSize: 28, lineHeight: 30 }, sheet: { backgroundColor: "#fff", borderTopLeftRadius: 24, borderTopRightRadius: 24, padding: 20, paddingBottom: 28 }, handle: { width: 48, height: 4, borderRadius: 3, backgroundColor: colors.border, alignSelf: "center", marginBottom: 20 }, sheetTitle: { color: colors.ink, fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 22 }, sheetSub: { color: colors.muted, fontSize: 13, lineHeight: 18, marginTop: 4, marginBottom: 10 }, option: { height: 60, borderBottomWidth: 1, borderColor: colors.border, flexDirection: "row", justifyContent: "space-between", alignItems: "center" }, optionText: { color: colors.ink, fontSize: 16 },
+});
+
+const complianceStyles = StyleSheet.create({
+  header: { minHeight: 56, backgroundColor: "#fff", borderBottomWidth: 1, borderColor: colors.border, flexDirection: "row", alignItems: "center", paddingHorizontal: 22, gap: 18 },
+  help: { width: 30, height: 30, borderRadius: 15, borderWidth: 2, borderColor: colors.muted, alignItems: "center", justifyContent: "center" },
+  helpText: { color: colors.muted, fontSize: 18, lineHeight: 21, fontWeight: "700" },
+  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 30, gap: 14 },
+  summary: { borderWidth: 1, borderRadius: 15, padding: 14, flexDirection: "row", alignItems: "flex-start", gap: 12 },
+  cleared: { minHeight: 100, backgroundColor: "#ECFDF3", borderColor: "#A7F3C2" },
+  blocked: { minHeight: 142, backgroundColor: "#FFF4F3", borderColor: "#FF9292" },
+  summaryIcon: { width: 40, height: 40, borderRadius: 20, alignItems: "center", justifyContent: "center", marginTop: 2 },
+  clearedIcon: { backgroundColor: "#18A957" },
+  blockedIcon: { backgroundColor: "#E5252A" },
+  summaryIconText: { color: "#fff", fontSize: 25, lineHeight: 27, fontWeight: "700" },
+  summaryTitle: { color: colors.ink, fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 20, lineHeight: 24 },
+  summaryDetail: { fontSize: 14, lineHeight: 20, marginTop: 3 },
+  clearedText: { color: "#16733A" },
+  blockedText: { color: "#B91C1C" },
+  documentCard: { backgroundColor: "#fff", borderRadius: 18, paddingHorizontal: 18, shadowColor: colors.fleetNavy, shadowOpacity: .07, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  documentRow: { minHeight: 76, flexDirection: "row", alignItems: "center", gap: 12 },
+  documentRule: { borderTopWidth: 1, borderColor: colors.border },
+  rowIcon: { width: 31, height: 31, borderRadius: 16, alignItems: "center", justifyContent: "center" },
+  rowGood: { backgroundColor: "#EAFBF1" },
+  rowBad: { backgroundColor: "#FFF0F0" },
+  rowWarn: { backgroundColor: "#FFF6E9" },
+  rowUpload: { backgroundColor: "#fff", borderWidth: 1.5, borderStyle: "dashed", borderColor: "#91A5C0" },
+  rowIconText: { color: "#16A34A", fontSize: 18, fontWeight: "700" },
+  rowBadText: { color: "#DC2626", fontSize: 22 },
+  rowWarnText: { color: "#C65B00" },
+  rowUploadText: { color: colors.muted },
+  documentTitle: { color: colors.ink, fontSize: 16, lineHeight: 20, fontWeight: "700" },
+  documentDetail: { color: colors.muted, fontSize: 13, lineHeight: 18, marginTop: 2 },
+  share: { height: 60, borderRadius: 13, backgroundColor: "#2D64E8", alignItems: "center", justifyContent: "center" },
+  shareText: { color: "#fff", fontSize: 16, fontWeight: "700" },
+  replaceLicence: { height: 60, borderRadius: 13, borderWidth: 1, borderColor: colors.border, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  replaceLicenceText: { color: colors.ink, fontSize: 16, fontWeight: "700" },
+});
+
+const shareStyles = StyleSheet.create({
+  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 32, gap: 16 },
+  qrCard: { minHeight: 272, borderRadius: 18, backgroundColor: "#fff", padding: 20, alignItems: "center", justifyContent: "center", shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  qr: { width: 170, height: 170, padding: 8, backgroundColor: "#fff", gap: 0 },
+  qrRow: { flex: 1, flexDirection: "row" },
+  qrCell: { flex: 1, backgroundColor: "#fff" },
+  qrCellOn: { backgroundColor: colors.ink },
+  qrHelp: { color: colors.muted, fontSize: 14, lineHeight: 20, textAlign: "center", marginTop: 14 },
+  linkCard: { borderRadius: 18, backgroundColor: "#fff", padding: 18, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  label: { color: colors.muted, fontSize: 10, lineHeight: 14, fontWeight: "700", letterSpacing: 1.1 },
+  link: { color: "#2563EB", fontFamily: "monospace", fontSize: 13, lineHeight: 20, marginTop: 6 },
+  durationLabel: { marginTop: 16, marginBottom: 9 },
+  segment: { height: 52, borderRadius: 12, padding: 4, backgroundColor: "#E5EBF3", flexDirection: "row" },
+  segmentOption: { flex: 1, borderRadius: 10, alignItems: "center", justifyContent: "center", paddingHorizontal: 3 },
+  segmentSelected: { backgroundColor: colors.ink },
+  segmentText: { color: colors.muted, fontSize: 12 },
+  segmentSelectedText: { color: "#fff" },
+  historyCard: { borderRadius: 18, backgroundColor: "#fff", paddingHorizontal: 18, shadowColor: colors.fleetNavy, shadowOpacity: .06, shadowRadius: 12, shadowOffset: { width: 0, height: 5 } },
+  historyRow: { minHeight: 64, flexDirection: "row", alignItems: "center", gap: 12 },
+  historyRule: { height: 1, backgroundColor: colors.border },
+  historyAvatar: { width: 36, height: 36, borderRadius: 18 },
+  historyCompany: { width: 36, height: 36, borderRadius: 18, backgroundColor: "#ECFDF8", alignItems: "center", justifyContent: "center" },
+  historyCompanyText: { color: "#07877D", fontSize: 12, fontWeight: "700" },
+  historyName: { flex: 1, color: colors.ink, fontSize: 14 },
+  historyDate: { color: colors.muted, fontFamily: "monospace", fontSize: 12 },
+  copyButton: { height: 60, borderRadius: 13, backgroundColor: "#2D64E8", alignItems: "center", justifyContent: "center" },
+  copyButtonText: { color: "#fff", fontSize: 17, fontWeight: "700" },
+});
+
 function CompanyTodayStandalone() {
   const appState = useAppState();
-  const [selected, setSelected] = useState(appState.operatorId || "op_redgum");
-  const [remember, setRemember] = useState(true);
+  const [selected, setSelected] = useState("op_barwon");
+  const [remember, setRemember] = useState(false);
   const companyRows = [
     {
       id: "op_redgum",
       code: "RF",
       name: "Redgum Freightlines",
-      detail: "Laverton VIC · Permanent",
-      last: "Last worked Yesterday",
-      colour: "#933112",
+      detail: "Laverton VIC",
+      type: "FULL TIME",
+      last: "Last worked yesterday",
+      colour: colors.fleetNavy,
     },
     {
       id: "op_barwon",
       code: "BF",
       name: "Barwon Fuel Haulage",
-      detail: "Corio VIC · Casual",
-      last: "Last worked Thursday 2 July",
-      colour: "#176F82",
+      detail: "Corio VIC",
+      type: "CASUAL",
+      last: "Last worked 1 July",
+      colour: "#12A6A7",
     },
   ];
   return (
-    <SafeAreaView style={companyStyles.safe}>
-      <ScrollView contentContainerStyle={companyStyles.content}>
+    <SafeAreaView edges={["top", "right", "left"]} style={companyStyles.safe}>
+      <View style={companyStyles.header}>
         <View style={companyStyles.headingRow}>
-          <Text
-            style={companyStyles.heading}
-            numberOfLines={2}
-            adjustsFontSizeToFit
-            minimumFontScale={0.84}
-          >
-            Who are you driving for{`\n`}today?
-          </Text>
+          <View style={companyStyles.headingCopy}>
+            <Text style={companyStyles.heading}>Good morning, Dave</Text>
+            <Text style={companyStyles.headingSubtitle}>Who are you driving for today?</Text>
+          </View>
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="About company selection"
@@ -296,9 +738,8 @@ function CompanyTodayStandalone() {
             <Text style={companyStyles.helpText}>?</Text>
           </Pressable>
         </View>
-        <Text style={companyStyles.subtitle}>
-          Your hours, jobs and checklists all belong to the company you pick.
-        </Text>
+      </View>
+      <ScrollView style={companyStyles.body} contentContainerStyle={companyStyles.content}>
         <View style={companyStyles.list}>
           {companyRows.map((company) => {
             const isSelected = selected === company.id;
@@ -313,41 +754,39 @@ function CompanyTodayStandalone() {
                   isSelected && companyStyles.cardSelected,
                 ]}
               >
+                {isSelected && <Text style={companyStyles.drivingBadge}>DRIVING TODAY</Text>}
                 <View
                   style={[
                     companyStyles.companyLogo,
                     { backgroundColor: company.colour },
                   ]}
                 >
-                  <Text style={companyStyles.companyCode}>{company.code}</Text>
+                  <Text style={[companyStyles.companyCode, company.id === "op_redgum" && companyStyles.redgumCode]}>{company.code}</Text>
                 </View>
                 <View style={companyStyles.companyCopy}>
                   <Text
                     style={companyStyles.companyName}
                     numberOfLines={1}
-                    adjustsFontSizeToFit
-                    minimumFontScale={0.82}
                   >
                     {company.name}
                   </Text>
                   <Text style={companyStyles.companyDetail} numberOfLines={1}>
                     {company.detail}
                   </Text>
+                  <Text style={[companyStyles.typeBadge, company.id === "op_barwon" && companyStyles.casualBadge]}>{company.type}</Text>
                   <Text style={companyStyles.companyLast} numberOfLines={1}>
                     {company.last}
                   </Text>
                 </View>
-                <View
-                  style={[
-                    companyStyles.radio,
-                    isSelected && companyStyles.radioSelected,
-                  ]}
-                >
-                  {isSelected && <View style={companyStyles.radioDot} />}
-                </View>
+                <Image source={require("../../../../assets/job-coastline.png")} style={companyStyles.companyImage} />
               </Pressable>
             );
           })}
+          <Pressable accessibilityRole="button" onPress={() => go("A26.A")} style={companyStyles.addCard}>
+            <View style={companyStyles.addIcon}><Text style={companyStyles.addIconText}>＋</Text></View>
+            <View style={companyStyles.companyCopy}><Text style={companyStyles.addTitle}>Add a company</Text><Text style={companyStyles.addDetail}>Use the driver ID and password they{`\n`}issued you</Text></View>
+            <MaterialIcons name="chevron-right" size={25} color="#93A4BA" />
+          </Pressable>
         </View>
         <Pressable
           accessibilityRole="checkbox"
@@ -371,12 +810,102 @@ function CompanyTodayStandalone() {
           label="Continue"
           onPress={() => {
             appState.setOperator(selected);
-            router.replace("/screen/A35");
+            appState.setShift("clocked_off");
+            router.replace("/dashboard");
           }}
         />
       </View>
     </SafeAreaView>
   );
+}
+
+function AddCompanyStandalone() {
+  const [operator, setOperator] = useState("Barwon Fuel Haulage");
+  const [driverId, setDriverId] = useState("BFH-2291");
+  const [companyPassword, setCompanyPassword] = useState("password");
+  const [invitationCode, setInvitationCode] = useState("BF7KQ2");
+  const [inviteOpen, setInviteOpen] = useState(false);
+  return (
+    <SafeAreaView style={addCompanyStyles.safe}>
+      <View style={addCompanyStyles.header}>
+        <Pressable accessibilityRole="button" accessibilityLabel="Back" onPress={() => router.back()} style={addCompanyStyles.back}>
+          <MaterialIcons name="chevron-left" size={30} color={colors.ink} />
+        </Pressable>
+        <Text style={addCompanyStyles.title}>Add a company</Text>
+      </View>
+      <ScrollView keyboardShouldPersistTaps="handled" contentContainerStyle={addCompanyStyles.content}>
+        <Text style={addCompanyStyles.intro}>Each operator issues you their own driver ID and password. Enter the ones on the letter or SMS they sent you.</Text>
+        <CompanyFormField label="Operator" value={operator} onChangeText={setOperator} />
+        <CompanyFormField label="Driver ID they issued" value={driverId} onChangeText={setDriverId} autoCapitalize="characters" />
+        <CompanyFormField label="Password they issued" value={companyPassword} onChangeText={setCompanyPassword} secureTextEntry />
+        <View style={addCompanyStyles.notice}>
+          <MaterialIcons name="lock-outline" size={22} color={colors.actionBlue} />
+          <Text style={addCompanyStyles.noticeText}>Linking lets Barwon Fuel Haulage see your verified file and allocate you work. It does not let them see any Redgum Freightlines run.</Text>
+        </View>
+        <Button label="Link this company" onPress={() => go("A26.L", true)} />
+        <Pressable accessibilityRole="button" onPress={() => setInviteOpen(true)} style={addCompanyStyles.invite}><Text style={addCompanyStyles.inviteText}>I have an invitation code instead</Text></Pressable>
+      </ScrollView>
+      <Modal visible={inviteOpen} transparent animationType="slide" onRequestClose={() => setInviteOpen(false)}>
+        <View style={addCompanyStyles.modalRoot}>
+          <Pressable accessibilityRole="button" accessibilityLabel="Close invitation code" onPress={() => setInviteOpen(false)} style={addCompanyStyles.scrim} />
+          <View style={addCompanyStyles.sheet}>
+            <View style={addCompanyStyles.handle} />
+            <Text style={addCompanyStyles.sheetTitle}>Invitation code</Text>
+            <Text style={addCompanyStyles.sheetSubtitle}>Six characters from the allocator, valid for 48 hours.</Text>
+            <TextInput
+              value={invitationCode}
+              onChangeText={(value) => setInvitationCode(value.toUpperCase())}
+              autoCapitalize="characters"
+              maxLength={6}
+              style={addCompanyStyles.codeInput}
+            />
+            <Button label="Use this code" onPress={() => go("A26.LI", true)} />
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+function CompanyFormField({ label, ...props }: { label: string } & React.ComponentProps<typeof TextInput>) {
+  return <View style={addCompanyStyles.field}><Text style={addCompanyStyles.label}>{label}</Text><TextInput {...props} style={addCompanyStyles.input} placeholderTextColor="#94A3B8" /></View>;
+}
+
+function CompanyLinkedStandalone({ showAcceptedPopup = false }: { showAcceptedPopup?: boolean }) {
+  const [acceptedOpen, setAcceptedOpen] = useState(showAcceptedPopup);
+  return (
+    <SafeAreaView style={linkedStyles.safe}>
+      <View style={linkedStyles.header}><Text style={linkedStyles.headerTitle}>Company linked</Text></View>
+      <ScrollView contentContainerStyle={linkedStyles.content}>
+        <View style={linkedStyles.successCard}>
+          <View style={linkedStyles.successIcon}><MaterialIcons name="check" size={32} color="#16A34A" /></View>
+          <Text style={linkedStyles.companyTitle}>Barwon Fuel Haulage linked</Text>
+          <Text style={linkedStyles.verified}>BFH-2291  ·  verified 11:41</Text>
+        </View>
+        <View style={linkedStyles.accessCard}>
+          <Text style={linkedStyles.sectionLabel}>WHAT THEY CAN SEE</Text>
+          <LinkedRow icon="check" text="Your verified file and expiry dates" />
+          <LinkedRow icon="check" text="Work you do for them, and only that work" />
+          <LinkedRow icon="close" text="Nothing from Redgum Freightlines" muted />
+        </View>
+        <View style={linkedStyles.warning}><MaterialIcons name="error-outline" size={20} color="#DC2626" /><Text style={linkedStyles.warningText}>Barwon run tankers. Your dangerous goods licence expired on 2 July, so they cannot allocate you a tanker until it is replaced.</Text></View>
+        <Button label="Done" onPress={() => go("A26", true)} />
+      </ScrollView>
+      <Modal visible={acceptedOpen} transparent animationType="fade" onRequestClose={() => setAcceptedOpen(false)}>
+        <View style={linkedStyles.popupRoot}>
+          <View style={linkedStyles.popupCard}>
+            <View style={linkedStyles.popupIcon}><MaterialIcons name="check" size={30} color="#16A34A" /></View>
+            <Text style={linkedStyles.popupTitle}>Invitation code accepted</Text>
+            <Pressable accessibilityRole="button" onPress={() => setAcceptedOpen(false)} style={linkedStyles.popupButton}><Text style={linkedStyles.popupButtonText}>OK</Text></Pressable>
+          </View>
+        </View>
+      </Modal>
+    </SafeAreaView>
+  );
+}
+
+function LinkedRow({ icon, text, muted = false }: { icon: "check" | "close"; text: string; muted?: boolean }) {
+  return <View style={linkedStyles.row}><MaterialIcons name={icon} size={20} color={icon === "check" ? "#16A34A" : "#DC2626"} /><Text style={[linkedStyles.rowText, muted && linkedStyles.rowMuted]}>{text}</Text></View>;
 }
 
 function PermissionsPrimerStandalone() {
@@ -444,11 +973,11 @@ const permissionStyles = StyleSheet.create({
   content: { paddingHorizontal: 16, paddingTop: 26, paddingBottom: 100 },
   heading: {
     fontFamily: "BarlowSemiCondensed_700Bold",
-    fontSize: 28,
-    lineHeight: 34,
+    fontSize: 23,
+    lineHeight: 28,
     color: colors.ink,
   },
-  subtitle: { marginTop: 5, fontSize: 15, lineHeight: 22, color: colors.muted },
+  subtitle: { marginTop: 5, fontSize: 13, lineHeight: 19, color: colors.muted },
   list: { marginTop: 24, gap: 14 },
   card: {
     minHeight: 100,
@@ -473,8 +1002,8 @@ const permissionStyles = StyleSheet.create({
     backgroundColor: "#EEF4FC",
   },
   copy: { flex: 1, gap: 4 },
-  itemTitle: { fontSize: 17, fontWeight: "800", color: colors.ink },
-  itemBody: { fontSize: 14, lineHeight: 20, color: colors.muted },
+  itemTitle: { fontSize: 15, fontWeight: "800", color: colors.ink },
+  itemBody: { fontSize: 12, lineHeight: 17, color: colors.muted },
   footer: {
     paddingHorizontal: 16,
     paddingTop: 12,
@@ -589,7 +1118,7 @@ const profileSetupStyles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.card },
   body: { backgroundColor: colors.appBg },
   header: {
-    minHeight: 62,
+    minHeight: 54,
     paddingHorizontal: 16,
     flexDirection: "row",
     alignItems: "center",
@@ -654,47 +1183,45 @@ const profileSetupStyles = StyleSheet.create({
 });
 
 const companyStyles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.appBg },
-  content: { paddingHorizontal: 20, paddingTop: 24, paddingBottom: 96 },
+  safe: { flex: 1, backgroundColor: "#FFFFFF" },
+  header: { minHeight: 78, paddingHorizontal: 28, paddingTop: 4, paddingBottom: 10, justifyContent: "center", backgroundColor: "#FFFFFF", borderBottomWidth: 1, borderBottomColor: colors.border },
+  body: { flex: 1, backgroundColor: colors.appBg },
+  content: { paddingHorizontal: 28, paddingTop: 0, paddingBottom: 96 },
   headingRow: { flexDirection: "row", alignItems: "flex-start", gap: 10 },
+  headingCopy: { flex: 1 },
   heading: {
-    flex: 1,
     fontFamily: "BarlowSemiCondensed_700Bold",
-    fontSize: 30,
-    lineHeight: 36,
+    fontSize: 24,
+    lineHeight: 29,
     color: colors.ink,
   },
+  headingSubtitle: { marginTop: 2, fontSize: 15, lineHeight: 20, color: colors.muted },
   help: {
-    width: 30,
-    height: 30,
+    width: 25,
+    height: 25,
     marginTop: 4,
-    borderWidth: 2,
+    borderWidth: 1.5,
     borderColor: colors.muted,
-    borderRadius: 15,
+    borderRadius: 13,
     alignItems: "center",
     justifyContent: "center",
   },
-  helpText: { fontSize: 18, fontWeight: "800", color: colors.muted },
-  subtitle: {
-    marginTop: 10,
-    fontSize: 16,
-    lineHeight: 22,
-    color: colors.muted,
-  },
+  helpText: { fontSize: 15, fontWeight: "800", color: colors.muted },
   list: { marginTop: 28, gap: 14 },
   card: {
-    minHeight: 92,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
+    minHeight: 134,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderWidth: 1.5,
     borderColor: colors.border,
     borderRadius: 16,
     backgroundColor: colors.card,
     flexDirection: "row",
-    alignItems: "center",
+    alignItems: "flex-start",
     gap: 12,
   },
-  cardSelected: { borderColor: colors.actionBlue, backgroundColor: "#F2F7FF" },
+  cardSelected: { borderColor: colors.actionBlue, backgroundColor: colors.card },
+  drivingBadge: { position: "absolute", top: -12, left: 16, zIndex: 2, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 4, overflow: "hidden", backgroundColor: colors.actionBlue, color: "#fff", fontSize: 11, fontWeight: "800", letterSpacing: .5 },
   companyLogo: {
     width: 48,
     height: 48,
@@ -703,10 +1230,19 @@ const companyStyles = StyleSheet.create({
     justifyContent: "center",
   },
   companyCode: { color: "#fff", fontSize: 16, fontWeight: "900" },
-  companyCopy: { flex: 1, gap: 3 },
-  companyName: { fontSize: 16, fontWeight: "800", color: colors.ink },
+  redgumCode: { color: colors.amber },
+  companyCopy: { flex: 1, minWidth: 0, gap: 4 },
+  companyName: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 18, lineHeight: 23, color: colors.ink },
   companyDetail: { fontSize: 13, color: colors.muted },
-  companyLast: { fontSize: 12, color: colors.muted },
+  companyLast: { alignSelf: "flex-start", borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 3, fontSize: 11, color: colors.muted },
+  typeBadge: { alignSelf: "flex-start", borderRadius: 12, paddingHorizontal: 10, paddingVertical: 4, overflow: "hidden", backgroundColor: "#EEF4FF", color: colors.actionBlue, fontSize: 10, fontWeight: "800", letterSpacing: .7 },
+  casualBadge: { backgroundColor: "#FFF6E8", color: "#B84D00" },
+  companyImage: { width: 66, height: 66, borderRadius: 12 },
+  addCard: { minHeight: 84, borderWidth: 1.5, borderStyle: "dashed", borderColor: "#8FA3BD", borderRadius: 16, paddingHorizontal: 14, flexDirection: "row", alignItems: "center", gap: 10 },
+  addIcon: { width: 38, height: 38, borderRadius: 11, backgroundColor: "#EEF4FC", alignItems: "center", justifyContent: "center" },
+  addIconText: { color: colors.actionBlue, fontSize: 22 },
+  addTitle: { color: colors.ink, fontSize: 15, fontWeight: "700" },
+  addDetail: { color: colors.muted, fontSize: 12, lineHeight: 17 },
   radio: {
     width: 32,
     height: 32,
@@ -731,11 +1267,12 @@ const companyStyles = StyleSheet.create({
     minHeight: 34,
   },
   checkbox: {
-    width: 28,
-    height: 28,
-    borderRadius: 6,
+    width: 22,
+    height: 22,
+    borderRadius: 5,
     borderWidth: 1.5,
-    borderColor: colors.border,
+    borderColor: "#94A3B8",
+    backgroundColor: "#FFFFFF",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -744,56 +1281,180 @@ const companyStyles = StyleSheet.create({
     borderColor: colors.actionBlue,
   },
   tick: { color: "#fff", fontSize: 17, fontWeight: "900" },
-  rememberText: { fontSize: 15, fontWeight: "700", color: colors.ink },
+  rememberText: { fontSize: 14, fontWeight: "400", color: colors.ink },
   footer: {
-    paddingHorizontal: 20,
+    paddingHorizontal: 28,
     paddingTop: 12,
-    paddingBottom: 16,
+    paddingBottom: 28,
     backgroundColor: colors.appBg,
   },
 });
 
-const signInStyles = StyleSheet.create({
+const addCompanyStyles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.appBg },
-  content: { paddingHorizontal: 22, paddingTop: 28, paddingBottom: 48 },
-  brand: {
-    fontFamily: "BarlowSemiCondensed_700Bold",
-    fontSize: 30,
-    lineHeight: 36,
-    letterSpacing: 0.2,
-    color: colors.fleetNavy,
-    marginBottom: 42,
+  header: { height: 54, paddingHorizontal: 28, flexDirection: "row", alignItems: "center", gap: 18, backgroundColor: "#fff", borderBottomWidth: 1, borderBottomColor: colors.border },
+  back: { width: 22, height: 40, alignItems: "center", justifyContent: "center" },
+  title: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 22, lineHeight: 27, color: colors.ink },
+  content: { paddingHorizontal: 20, paddingTop: 18, paddingBottom: 36, gap: 12 },
+  intro: { color: colors.muted, fontSize: 14, lineHeight: 20, marginBottom: 2 },
+  field: { gap: 6 },
+  label: { color: colors.muted, fontSize: 11, lineHeight: 15, fontWeight: "800", letterSpacing: 1, textTransform: "uppercase" },
+  input: { height: 50, borderWidth: 1, borderColor: colors.border, borderRadius: 12, backgroundColor: "#fff", paddingHorizontal: 16, color: colors.ink, fontSize: 16 },
+  notice: { borderRadius: 14, paddingHorizontal: 14, paddingVertical: 13, flexDirection: "row", alignItems: "flex-start", gap: 12, backgroundColor: "#EEF4FC" },
+  noticeText: { flex: 1, color: colors.ink, fontSize: 12, lineHeight: 17 },
+  invite: { minHeight: 38, alignItems: "center", justifyContent: "center" },
+  inviteText: { color: colors.actionBlue, fontSize: 15, fontWeight: "700" },
+  modalRoot: { flex: 1, justifyContent: "flex-end" },
+  scrim: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(14, 32, 51, .48)" },
+  sheet: { borderTopLeftRadius: 26, borderTopRightRadius: 26, paddingHorizontal: 28, paddingTop: 10, paddingBottom: 38, gap: 12, backgroundColor: "#FFFFFF" },
+  handle: { width: 54, height: 5, borderRadius: 3, alignSelf: "center", marginBottom: 8, backgroundColor: "#DCE4EE" },
+  sheetTitle: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 23, lineHeight: 28, color: colors.ink },
+  sheetSubtitle: { marginTop: -7, fontSize: 13, lineHeight: 18, color: colors.muted },
+  codeInput: { height: 64, marginTop: 6, borderWidth: 1, borderColor: colors.border, borderRadius: 12, backgroundColor: "#FFFFFF", textAlign: "center", color: colors.ink, fontSize: 25, fontWeight: "700", letterSpacing: 7 },
+});
+
+const linkedStyles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: colors.appBg },
+  header: { height: 54, justifyContent: "center", paddingHorizontal: 20, backgroundColor: "#FFFFFF", borderBottomWidth: 1, borderBottomColor: colors.border },
+  headerTitle: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 21, color: colors.ink },
+  content: { paddingHorizontal: 20, paddingTop: 20, paddingBottom: 36, gap: 14 },
+  successCard: { minHeight: 172, borderRadius: 17, alignItems: "center", justifyContent: "center", padding: 18, backgroundColor: "#FFFFFF", shadowColor: colors.fleetNavy, shadowOpacity: .05, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  successIcon: { width: 62, height: 62, borderRadius: 31, alignItems: "center", justifyContent: "center", marginBottom: 14, backgroundColor: "#ECFDF3" },
+  companyTitle: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 23, lineHeight: 28, color: colors.ink, textAlign: "center" },
+  verified: { marginTop: 10, fontFamily: "monospace", fontSize: 12, color: colors.muted },
+  accessCard: { borderRadius: 17, paddingHorizontal: 18, paddingTop: 18, paddingBottom: 8, backgroundColor: "#FFFFFF", shadowColor: colors.fleetNavy, shadowOpacity: .05, shadowRadius: 10, shadowOffset: { width: 0, height: 4 } },
+  sectionLabel: { marginBottom: 5, color: colors.muted, fontSize: 11, fontWeight: "800", letterSpacing: 1 },
+  row: { minHeight: 48, flexDirection: "row", alignItems: "center", gap: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
+  rowText: { flex: 1, color: colors.ink, fontSize: 14, lineHeight: 19 },
+  rowMuted: { color: colors.muted },
+  warning: { borderRadius: 15, padding: 16, flexDirection: "row", alignItems: "flex-start", gap: 12, backgroundColor: "#FFF0F0" },
+  warningText: { flex: 1, color: "#B91C1C", fontSize: 13, lineHeight: 19 },
+  popupRoot: { flex: 1, alignItems: "center", justifyContent: "center", padding: 28, backgroundColor: "rgba(14,32,51,.48)" },
+  popupCard: { width: "100%", maxWidth: 330, borderRadius: 20, padding: 24, alignItems: "center", backgroundColor: "#FFFFFF" },
+  popupIcon: { width: 58, height: 58, borderRadius: 29, alignItems: "center", justifyContent: "center", marginBottom: 14, backgroundColor: "#ECFDF3" },
+  popupTitle: { fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 23, color: colors.ink, textAlign: "center" },
+  popupButton: { width: "100%", height: 48, marginTop: 22, borderRadius: 12, alignItems: "center", justifyContent: "center", backgroundColor: colors.actionBlue },
+  popupButtonText: { color: "#FFFFFF", fontSize: 16, fontWeight: "700" },
+});
+
+const signInStyles = StyleSheet.create({
+  safe: { flex: 1, backgroundColor: "#FFFFFF" },
+  content: {
+    flexGrow: 1,
+    paddingHorizontal: 24,
+    paddingTop: 0,
+    paddingBottom: 16,
   },
+  mark: {
+    width: 58,
+    height: 58,
+    borderRadius: 14,
+    backgroundColor: colors.fleetNavy,
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 5,
+  },
+  markLine: { height: 4, borderRadius: 3, backgroundColor: "#AAB8C8" },
+  markLineShort: { width: 20 },
+  markLineMiddle: { width: 28 },
+  markLineAmber: { width: 38, backgroundColor: colors.amber },
+  intro: { marginTop: 32, marginBottom: 18 },
   title: {
     fontFamily: "BarlowSemiCondensed_700Bold",
-    fontSize: 42,
-    lineHeight: 48,
-    letterSpacing: -0.8,
+    fontSize: 29,
+    lineHeight: 35,
+    letterSpacing: -0.25,
     color: colors.ink,
   },
   subtitle: {
-    fontSize: 18,
-    lineHeight: 26,
-    color: colors.muted,
-    marginTop: 4,
-    marginBottom: 36,
-  },
-  form: { gap: 20 },
-  fieldLabel: {
     fontSize: 16,
     lineHeight: 22,
-    fontWeight: "700",
-    letterSpacing: 0,
-    textTransform: "none",
-    color: colors.midNavy,
+    color: colors.muted,
+    marginTop: 4,
   },
+  form: { gap: 16 },
+  field: { gap: 8 },
+  fieldLabel: {
+    fontSize: 12,
+    lineHeight: 16,
+    fontWeight: "700",
+    letterSpacing: 1.1,
+    textTransform: "uppercase",
+    color: colors.muted,
+  },
+  input: {
+    height: 55,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 12,
+    paddingHorizontal: 20,
+    fontSize: 18,
+    color: colors.ink,
+    backgroundColor: "#FFFFFF",
+  },
+  inputError: {
+    borderColor: "#DC2626",
+  },
+  errorText: {
+    marginTop: -4,
+    color: "#DC2626",
+    fontSize: 12,
+    lineHeight: 16,
+  },
+  signInButton: {
+    height: 60,
+    marginTop: 4,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: colors.actionBlue,
+  },
+  signInButtonDisabled: { opacity: 1 },
+  signInButtonText: { color: "#FFFFFF", fontSize: 18, fontWeight: "700" },
+  pressed: { opacity: 0.8 },
   forgot: {
-    minHeight: 32,
-    marginTop: -10,
+    minHeight: 34,
+    marginTop: 2,
     alignItems: "center",
     justifyContent: "center",
   },
-  forgotText: { fontSize: 14, fontWeight: "700", color: colors.actionBlue },
+  forgotText: { fontSize: 16, fontWeight: "700", color: colors.actionBlue },
+  dividerRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 14,
+    marginTop: 12,
+  },
+  divider: {
+    height: 1,
+    minWidth: 36,
+    backgroundColor: "#D7E0EA",
+    flex: 1,
+  },
+  dividerText: {
+    fontSize: 12,
+    fontWeight: "700",
+    letterSpacing: 1.05,
+    color: "#94A3B8",
+    textTransform: "uppercase",
+  },
+  createButton: {
+    height: 60,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 14,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  createButtonText: { color: colors.ink, fontSize: 18, fontWeight: "700" },
+  version: {
+    marginTop: "auto",
+    paddingTop: 36,
+    textAlign: "center",
+    color: colors.muted,
+    fontSize: 12,
+    lineHeight: 18,
+  },
   modalRoot: { flex: 1, justifyContent: "flex-end" },
   scrim: { ...StyleSheet.absoluteFill, backgroundColor: "rgba(14,32,51,.46)" },
   sheet: {
@@ -805,6 +1466,7 @@ const signInStyles = StyleSheet.create({
     paddingBottom: 38,
     gap: 16,
   },
+  successSheet: { alignItems: "stretch", paddingTop: 12, paddingBottom: 38 },
   handle: {
     width: 56,
     height: 6,
@@ -824,10 +1486,12 @@ const signInStyles = StyleSheet.create({
   closeButton: {
     width: 48,
     height: 48,
+    borderRadius: 12,
+    backgroundColor: "#F4F6FA",
     alignItems: "center",
     justifyContent: "center",
   },
-  closeText: { fontSize: 38, lineHeight: 42, color: colors.muted },
+  closeText: { fontSize: 24, lineHeight: 28, color: colors.muted },
   sheetSubtitle: {
     fontSize: 15,
     lineHeight: 22,
@@ -835,6 +1499,10 @@ const signInStyles = StyleSheet.create({
     marginTop: -16,
     maxWidth: 380,
   },
+  resetSuccessIcon: { width: 60, height: 60, borderRadius: 30, alignSelf: "center", alignItems: "center", justifyContent: "center", backgroundColor: "#ECFDF3", marginTop: 4 },
+  resetSuccessCheck: { color: "#16A34A", fontSize: 28, lineHeight: 31, fontWeight: "700" },
+  resetSuccessTitle: { color: colors.ink, fontFamily: "BarlowSemiCondensed_700Bold", fontSize: 24, lineHeight: 29, textAlign: "center", marginTop: 4 },
+  resetSuccessText: { color: colors.muted, fontSize: 14, lineHeight: 20, textAlign: "center", marginBottom: 12 },
   emailSuccess: {
     width: 92,
     height: 92,

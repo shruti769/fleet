@@ -40,6 +40,7 @@ export function ScreenShell({
         <Text style={styles.id}>{id}</Text>
       </View>
       <ScrollView
+        style={styles.body}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={styles.content}
       >
@@ -50,11 +51,13 @@ export function ScreenShell({
   );
 }
 const styles = StyleSheet.create({
-  safe: { flex: 1, backgroundColor: colors.appBg },
+  // Keep the status-bar area visually continuous with every white title bar.
+  safe: { flex: 1, backgroundColor: colors.card },
+  body: { backgroundColor: colors.appBg },
   header: {
-    minHeight: 72,
-    paddingHorizontal: spacing.screen,
-    paddingVertical: spacing.sm,
+    minHeight: 50,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.xs,
     flexDirection: "row",
     alignItems: "center",
     gap: spacing.sm,
@@ -63,22 +66,22 @@ const styles = StyleSheet.create({
     backgroundColor: colors.card,
   },
   back: {
-    fontSize: 38,
-    lineHeight: 44,
+    fontSize: 30,
+    lineHeight: 36,
     color: colors.ink,
-    minWidth: 48,
+    minWidth: 38,
     textAlign: "center",
   },
   module: {
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: "700",
     letterSpacing: 1.2,
     color: colors.muted,
     textTransform: "uppercase",
   },
-  title: { fontSize: 22, fontWeight: "700", color: colors.ink },
-  id: { fontFamily: "monospace", fontSize: 12, color: colors.muted },
-  content: { padding: spacing.screen, gap: spacing.md, paddingBottom: 40 },
+  title: { fontSize: 18, lineHeight: 22, fontWeight: "700", color: colors.ink },
+  id: { fontFamily: "monospace", fontSize: 10, color: colors.muted },
+  content: { padding: spacing.md, gap: spacing.sm, paddingBottom: 28 },
   footer: {
     padding: spacing.screen,
     borderTopWidth: 1,
