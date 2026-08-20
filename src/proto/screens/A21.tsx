@@ -14,19 +14,19 @@ export default function ScreenA21() {
       <AppHeader title="Timesheet" sub="Week to 12 July" showBack={true} onBack={v.back} />
       <ScrollView style={s.s2} contentContainerStyle={s.s3} showsVerticalScrollIndicator={false}>
         <View style={s.s4}>
-          <View style={s.s5}>
-            <Text style={s.s6}>
+          <View style={v.timesheetWeek ? s.s8 : s.s5}>
+            <Text style={v.timesheetWeek ? s.s9 : s.s6}>
               This shift
             </Text>
-            <Text style={s.s7}>
+            <Text style={v.timesheetWeek ? s.s10 : s.s7}>
               02:47
             </Text>
           </View>
-          <View style={s.s8}>
-            <Text style={s.s9}>
+          <View style={v.timesheetWeek ? s.s5 : s.s8}>
+            <Text style={v.timesheetWeek ? s.s6 : s.s9}>
               This week
             </Text>
-            <Text style={s.s10}>
+            <Text style={v.timesheetWeek ? s.s7 : s.s10}>
               31 h 45 m
             </Text>
           </View>

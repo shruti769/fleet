@@ -144,8 +144,10 @@ import Overlay_B5_M1 from './overlays/B5_M1';
 import Overlay_B7_M1 from './overlays/B7_M1';
 import Overlay_C2_M1 from './overlays/C2_M1';
 import Overlay_C3_M1 from './overlays/C3_M1';
+import Screen_A37 from './A37';
 
 export const screens: Record<string, ComponentType> = {
+  'A37': Screen_A37,
   'A1': Screen_A1,
   'A1.S1': Screen_A1_S1,
   'A2': Screen_A2,

@@ -23,6 +23,7 @@ type State = {
   remember: boolean;
   clockedOn: boolean;
   onBreak: boolean;
+  timesheetView: 'shift' | 'week';
   available: boolean;
   fitForDuty: string;
   preStart: string;
@@ -67,6 +68,7 @@ const initialState: State = {
   remember: false,
   clockedOn: false,
   onBreak: false,
+  timesheetView: 'shift',
   available: false,
   fitForDuty: 'not started',
   preStart: 'not started',
@@ -181,7 +183,7 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (screen === 'A16') setState((prev) => ({ ...prev, q: 0 }));
     if (screen === 'A1') {
-      const t = setTimeout(() => go('A2', 'replace'), 1200);
+      const t = setTimeout(() => go('A2', 'replace'), 5000);
       return () => clearTimeout(t);
     }
     if (screen === 'A26.S1') {

@@ -146,6 +146,17 @@ function buildVals(store: ReturnType<typeof useStore>) {
     ...nav,
     ...toastVals,
 
+    openNotifications: () => go('A37', 'replace'),
+    openTimesheetShift: () => {
+      set({ timesheetView: 'shift' });
+      go('A21', 'push');
+    },
+    openTimesheetWeek: () => {
+      set({ timesheetView: 'week' });
+      go('A21', 'push');
+    },
+    timesheetWeek: s.timesheetView === 'week',
+
     back,
     dismiss,
     overlayOn: !!s.overlay,

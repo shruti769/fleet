@@ -22,7 +22,7 @@ export default function ScreenA27_S2() {
             </Svg>
           </Pressable>
           <View style={s.s5} />
-          <Pressable onPress={v.push_A22} style={s.s6}>
+          <Pressable onPress={v.openNotifications} style={s.s6}>
             <Svg width={24} height={24} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
               <Path d="M18 8.5a6 6 0 0 0-12 0c0 6.5-2.5 8.5-2.5 8.5h17S18 15 18 8.5" />
               <Path d="M13.7 20.5a2 2 0 0 1-3.4 0" />
@@ -52,7 +52,7 @@ export default function ScreenA27_S2() {
           <Text style={s.s17}>End break</Text>
         </Pressable>
         <View style={s.s18}>
-          <Pressable onPress={v.push_A21} style={s.s19}>
+          <Pressable onPress={v.openTimesheetShift} style={s.s19}>
             <Text style={s.s20}>
               This shift
             </Text>
@@ -63,7 +63,7 @@ export default function ScreenA27_S2() {
               Paused
             </Text>
           </Pressable>
-          <Pressable onPress={v.push_A21} style={s.s19}>
+          <Pressable onPress={v.openTimesheetWeek} style={s.s19}>
             <Text style={s.s20}>
               This week
             </Text>

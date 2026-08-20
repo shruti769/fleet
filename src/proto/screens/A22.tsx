@@ -32,9 +32,6 @@ export default function ScreenA22() {
                   <Text style={s.s7}>
                     {t.who}
                   </Text>
-                  {t.unread ? (
-                    <View style={s.s8} />
-                  ) : null}
                 </View>
                 <Text style={s.s9} numberOfLines={1}>
                   {t.preview}
@@ -42,6 +39,11 @@ export default function ScreenA22() {
               </View>
               <View style={s.s10}>
                 <Text style={s.s11}>{t.at}</Text>
+                {t.unread ? (
+                  <View style={s.s8}>
+                    <Text style={s.s8Text}>1</Text>
+                  </View>
+                ) : null}
               </View>
             </Pressable>
             </React.Fragment>
@@ -108,10 +110,21 @@ const s = StyleSheet.create({
     textAlign: "left",
   },
   s8: {
+    alignItems: "center",
     backgroundColor: "#2563EB",
     borderRadius: 999,
-    height: 8,
-    width: 8,
+    height: 18,
+    justifyContent: "center",
+    minWidth: 18,
+    paddingLeft: 5,
+    paddingRight: 5,
+  },
+  s8Text: {
+    color: "#FFFFFF",
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    lineHeight: 12,
+    textAlign: "center",
   },
   s9: {
     color: "#5B6B7F",
@@ -121,8 +134,10 @@ const s = StyleSheet.create({
     textAlign: "left",
   },
   s10: {
+    alignItems: "flex-end",
     flexGrow: 0,
     flexShrink: 0,
+    gap: 6,
   },
   s11: {
     color: "#5B6B7F",

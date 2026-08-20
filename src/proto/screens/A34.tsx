@@ -127,9 +127,6 @@ export default function ScreenA34() {
         <Pressable onPress={v.open_A34_M3} style={s.s20}>
           <Text style={s.s21}>Sign out</Text>
         </Pressable>
-        <Text style={s.s22}>
-          FleetSync 4.2.0 · Records held by each operator for three years
-        </Text>
       </ScrollView>
       <TabBar active="profile" onRun={v.tabRun} onNav={v.tab_A6} onComp={v.tab_A25} onMsg={v.tab_A22} onProf={v.tab_A34} />
     </View>
@@ -339,13 +336,6 @@ const s = StyleSheet.create({
     fontFamily: "Inter_600SemiBold",
     fontSize: 16,
     lineHeight: 16,
-    textAlign: "center",
-  },
-  s22: {
-    color: "#5B6B7F",
-    fontFamily: "Inter_400Regular",
-    fontSize: 12,
-    lineHeight: 18,
     textAlign: "center",
   },
 });

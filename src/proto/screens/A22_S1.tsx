@@ -21,7 +21,6 @@ export default function ScreenA22_S1() {
               <Text style={s.s7}>
                 Kate Ryan
               </Text>
-              <View style={s.s8} />
             </View>
             <Text style={s.s9} numberOfLines={1}>
               Coastline moved the dock window to 11:00.
@@ -29,6 +28,9 @@ export default function ScreenA22_S1() {
           </View>
           <View style={s.s10}>
             <Text style={s.s11}>11:38</Text>
+            <View style={s.s8}>
+              <Text style={s.s8Text}>1</Text>
+            </View>
           </View>
         </Pressable>
         <Pressable onPress={v.push_A22_M1} style={s.s4}>
@@ -38,7 +40,6 @@ export default function ScreenA22_S1() {
               <Text style={s.s7}>
                 Redgum workshop
               </Text>
-              <View style={s.s8} />
             </View>
             <Text style={s.s9} numberOfLines={1}>
               Air line on T-4471 is booked in for Friday.
@@ -46,6 +47,9 @@ export default function ScreenA22_S1() {
           </View>
           <View style={s.s10}>
             <Text style={s.s11}>09:12</Text>
+            <View style={s.s8}>
+              <Text style={s.s8Text}>1</Text>
+            </View>
           </View>
         </Pressable>
         <Pressable onPress={v.push_A22_M1} style={s.s12}>
@@ -124,10 +128,21 @@ const s = StyleSheet.create({
     textAlign: "left",
   },
   s8: {
+    alignItems: "center",
     backgroundColor: "#2563EB",
     borderRadius: 999,
-    height: 8,
-    width: 8,
+    height: 18,
+    justifyContent: "center",
+    minWidth: 18,
+    paddingLeft: 5,
+    paddingRight: 5,
+  },
+  s8Text: {
+    color: "#FFFFFF",
+    fontFamily: "Inter_700Bold",
+    fontSize: 10,
+    lineHeight: 12,
+    textAlign: "center",
   },
   s9: {
     color: "#0F1B2A",
@@ -137,8 +152,10 @@ const s = StyleSheet.create({
     textAlign: "left",
   },
   s10: {
+    alignItems: "flex-end",
     flexGrow: 0,
     flexShrink: 0,
+    gap: 6,
   },
   s11: {
     color: "#2563EB",
