@@ -50,7 +50,10 @@
     ],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.thebrainburners.fleetsync"
+      "bundleIdentifier": "com.thebrainburners.fleetsync",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "adaptiveIcon": {
@@ -62,14 +65,23 @@
       "predictiveBackGestureEnabled": false,
       "package": "com.thebrainburners.fleetsync",
       "permissions": [
-        "CAMERA",
-        "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION",
-        "POST_NOTIFICATIONS"
+        "android.permission.CAMERA",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.USE_BIOMETRIC",
+        "android.permission.USE_FINGERPRINT"
       ]
     },
     "web": {
       "favicon": "./assets/favicon.png"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "d4e78024-66a3-4a4f-95a1-cb41f159739e"
+      }
     }
   }
 }
