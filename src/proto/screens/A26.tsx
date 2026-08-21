@@ -14,7 +14,7 @@ export default function ScreenA26() {
       <View style={s.s2}>
         <View style={s.s3}>
           <Text style={s.s4}>
-            Good morning, Dave
+            Good morning, {v.userName}
           </Text>
           <Text style={s.s5}>
             Who are you driving for today?

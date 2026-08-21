@@ -30,7 +30,7 @@ export default function ScreenA27_S3() {
           </Pressable>
         </View>
         <View style={s.s7}>
-          <Text style={s.s8}>Good morning, Dave</Text>
+          <Text style={s.s8}>Good morning, {v.userName}</Text>
         </View>
         <View style={s.s9}>
           <Text style={s.s10}>Wednesday 8 July</Text>

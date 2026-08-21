@@ -166,6 +166,8 @@ function buildVals(store: ReturnType<typeof useStore>) {
     hiDark: !D.darkBottom.includes(screen),
     toastOn: !!s.toast,
     toastMsg: s.toast,
+    userName: s.userName,
+    setUserName: (userName: string) => set({ userName }),
 
     /* company and operator */
     opName,

@@ -11,7 +11,7 @@ export default function ScreenA26_S2() {
       <View style={[s.s1, { height: insets.top }]} />
       <View style={s.s2}>
         <Text style={s.s3}>
-          Good morning, Dave
+          Good morning, {v.userName}
         </Text>
         <Text style={s.s4}>
           Who are you driving for today?

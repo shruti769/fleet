@@ -17,6 +17,7 @@ export const fromRoute = (segment: string) => segment.replace(/_/g, '.');
 export type GoMode = 'push' | 'replace' | 'sheet' | 'tab' | 'root' | 'modal';
 
 type State = {
+  userName: string;
   overlay: string | null;
   toast: string;
   operator: string | null;
@@ -62,6 +63,7 @@ type State = {
 };
 
 const initialState: State = {
+  userName: 'Driver',
   overlay: null,
   toast: '',
   operator: null,

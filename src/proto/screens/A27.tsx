@@ -31,7 +31,7 @@ export default function ScreenA27() {
           </Pressable>
         </View>
         <View style={s.s8}>
-          <Text style={s.s9}>Good morning, Dave</Text>
+          <Text style={s.s9}>Good morning, {v.userName}</Text>
         </View>
         <View style={s.s10}>
           <Text style={s.s11}>Wednesday 8 July · Clocked off</Text>
