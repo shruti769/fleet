@@ -28,8 +28,8 @@ exported from the screen registry.
 
 ## Structure
 
-- `app/` — Expo Router routes. `app/s/[id].tsx` renders any artboard; ids travel
-  with `.` written as `_`, so `A27.S1` is at `/s/A27_S1`.
+- `app/` — Expo Router routes. `app/screens/[id].tsx` renders any artboard; ids travel
+  with `.` written as `_`, so `A27.S1` is at `/screens/A27_S1`.
 - `src/proto/screens/` — one component per artboard, plus `overlays/`.
 - `src/proto/components/` — `AppHeader` and `TabBar`, the two shared artboards.
 - `src/proto/runtime/` — the prototype's state machine (`state.tsx`), its

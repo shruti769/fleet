@@ -11,7 +11,7 @@ import { router, usePathname } from 'expo-router';
 import * as D from './data';
 
 /** Screen ids travel through the router with `.` swapped for `_`. */
-export const toRoute = (id: string) => `/s/${id.replace(/\./g, '_')}` as const;
+export const toRoute = (id: string) => `/screens/${id.replace(/\./g, '_')}` as const;
 export const fromRoute = (segment: string) => segment.replace(/_/g, '.');
 
 export type GoMode = 'push' | 'replace' | 'sheet' | 'tab' | 'root' | 'modal';
@@ -128,7 +128,7 @@ export function PrototypeProvider({ children }: { children: React.ReactNode }) {
   const syncTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const screen = useMemo(() => {
-    const match = /^\/s\/(.+)$/.exec(pathname);
+    const match = /^\/screens\/(.+)$/.exec(pathname);
     return match ? fromRoute(decodeURIComponent(match[1])) : 'A1';
   }, [pathname]);
 

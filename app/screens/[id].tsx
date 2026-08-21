@@ -5,7 +5,7 @@ import { fromRoute } from '@/proto/runtime/state';
 
 /**
  * One route for every artboard. Ids travel with `.` written as `_`, so
- * `A27.S1` is reached at `/s/A27_S1`.
+ * `A27.S1` is reached at `/screens/A27_S1`.
  */
 export default function ScreenRoute() {
   const { id } = useLocalSearchParams<{ id: string }>();
