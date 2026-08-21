@@ -381,6 +381,16 @@ export const checkItems = [
   'Mirrors and glass',
   'Coupling and safety chains',
   'Load restraint',
+  'Steering and suspension',
+  'Fluid levels and leaks',
+  'Horn and warning devices',
+  'Wipers and washers',
+  'Seat belts and cab security',
+  'Registration and number plates',
+  'Fire extinguisher',
+  'First aid kit',
+  'Emergency equipment',
+  'Vehicle body and mudguards',
 ];
 
 export const tankerItems = [

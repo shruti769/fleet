@@ -45,6 +45,7 @@ type State = {
   target: number | undefined;
   scanned: number;
   sig: boolean;
+  deliveryPhoto: boolean;
   podReason: string;
   incidentType: string;
   notif: Record<string, boolean>;
@@ -91,6 +92,7 @@ const initialState: State = {
   target: undefined,
   scanned: 18,
   sig: false,
+  deliveryPhoto: false,
   podReason: 'Choose a reason',
   incidentType: 'Choose a type',
   notif: {},

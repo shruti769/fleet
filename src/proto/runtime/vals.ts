@@ -59,6 +59,7 @@ function buildVals(store: ReturnType<typeof useStore>) {
 
   /* -- pre start ---------------------------------------------------- */
   const marked = Object.keys(s.checks).length;
+  const activeCheckCount = screen === 'A14.S3' ? D.tankerItems.length : D.checkItems.length;
   const mkRows = (names: string[]) =>
     names.map((name, i) => ({
       name,
@@ -285,7 +286,7 @@ function buildVals(store: ReturnType<typeof useStore>) {
     /* shift */
     openCompany: () => go(s.clockedOn ? 'A27.M5' : 'A27.M4', 'sheet'),
     confirmClockOn: () => {
-      set({ clockedOn: true });
+      set({ clockedOn: true, fitForDuty: 'not started', preStart: 'not started', checks: {}, q: 0 });
       go('A27.S1', 'replace');
     },
     takeBreak: () => {
@@ -316,7 +317,12 @@ function buildVals(store: ReturnType<typeof useStore>) {
       go('A26', 'replace');
     },
     tabRun: () => go(s.clockedOn ? 'A27.S1' : 'A27', 'tab'),
-    gatePrestart: () => toast('Complete Fit for Duty first'),
+    fitForDutyComplete: s.fitForDuty === 'complete',
+    preStartComplete: s.preStart === 'complete',
+    gatePrestart: () => {
+      if (s.fitForDuty === 'complete') go('A14', 'push');
+      else toast('Complete Fit for Duty first');
+    },
 
     /* fit for duty */
     qText: qq.q,
@@ -342,11 +348,19 @@ function buildVals(store: ReturnType<typeof useStore>) {
     },
 
     /* pre start and defects */
-    checkProgress: `${Math.min(3 + marked, 16)} of 16`,
-    checkPct: `${(Math.min(3 + marked, 16) / 16) * 100}%` as `${number}%`,
+    checkProgress: `${Math.min(marked, activeCheckCount)} of ${activeCheckCount}`,
+    checkPct: `${(Math.min(marked, activeCheckCount) / activeCheckCount) * 100}%` as `${number}%`,
     checkRows: mkRows(D.checkItems),
     tankerRows: mkRows(D.tankerItems),
     activeCheck: s.activeCheck,
+    finishPrestart: () => {
+      if (marked < activeCheckCount) {
+        toast(`Complete all checks first (${marked} of ${activeCheckCount})`);
+        return;
+      }
+      set({ preStart: 'complete' });
+      go('A14.S1', 'replace');
+    },
     passItem: () => {
       set((x) => ({ checks: { ...x.checks, [x.pending]: 'pass' } }));
       back();
@@ -484,11 +498,13 @@ function buildVals(store: ReturnType<typeof useStore>) {
     })),
     statusNow: D.statuses[si].label,
     statusNext: D.statuses[Math.min(si + 1, 4)].label,
+    hasArrived: si >= 2,
     advanceStatus: () => {
       const n = Math.min(s.target === undefined ? si + 1 : s.target, 4);
       set({ statusIdx: n });
       dismiss();
       toast(`Marked as ${D.statuses[n].label}, recorded 11:41`);
+      if (n === 2) go('A8', 'replace');
     },
     arrived: () => {
       set({ target: 2 });
@@ -516,12 +532,14 @@ function buildVals(store: ReturnType<typeof useStore>) {
     },
     clearSig: () => set({ sig: false }),
     addPodPhoto: () => {
+      set({ deliveryPhoto: true });
       back();
       toast('Photo added to the delivery');
     },
+    deliveryPhoto: s.deliveryPhoto,
     completeDelivery: () => go('A9.S1', 'replace'),
     nextStop: () => {
-      set({ statusIdx: 1, sig: false, scanned: 18 });
+      set({ statusIdx: 1, sig: false, scanned: 18, deliveryPhoto: false, podReason: 'Choose a reason' });
       go('A5', 'replace');
     },
     podReason: s.podReason,
@@ -532,9 +550,19 @@ function buildVals(store: ReturnType<typeof useStore>) {
         dismiss();
       },
     })),
-    recordFailed: () => {
+    recordFailed: (notes: string) => {
+      if (s.podReason === 'Choose a reason') {
+        toast('Choose a reason for the unsuccessful delivery');
+        return false;
+      }
+      if (!notes.trim()) {
+        toast('Describe what happened');
+        return false;
+      }
+      set({ statusIdx: 4 });
       go('A4', 'root');
-      toast('Kate Ryan notified');
+      toast('Unsuccessful delivery recorded. Kate Ryan notified');
+      return true;
     },
 
     /* comments */

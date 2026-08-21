@@ -53,9 +53,16 @@ export default function ScreenA8() {
             Every change is timestamped and geotagged.
           </Text>
         </View>
-        <Pressable onPress={v.push_A10} style={s.s14}>
-          <Text style={s.s15}>Scan pallets</Text>
-        </Pressable>
+        {v.hasArrived ? (
+          <>
+            <Pressable onPress={v.push_A10} style={s.s14}>
+              <Text style={s.s15}>Scan pallets</Text>
+            </Pressable>
+            <Pressable onPress={v.push_A11} style={s.failedButton}>
+              <Text style={s.failedButtonText}>Unsuccessful delivery</Text>
+            </Pressable>
+          </>
+        ) : null}
       </ScrollView>
     </View>
   );
@@ -188,5 +195,12 @@ const s = StyleSheet.create({
     fontSize: 16,
     lineHeight: 16,
     textAlign: "center",
+  },
+  failedButton: {
+    alignItems: "center", backgroundColor: "#FFFFFF", borderColor: "#DC2626", borderRadius: 12,
+    borderWidth: 1, flexDirection: "row", height: 56, justifyContent: "center", width: "100%",
+  },
+  failedButtonText: {
+    color: "#DC2626", fontFamily: "Inter_600SemiBold", fontSize: 16, lineHeight: 16, textAlign: "center",
   },
 });

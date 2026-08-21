@@ -86,7 +86,7 @@ export default function ScreenA14() {
               </React.Fragment>
           ))}
         </View>
-        <Pressable onPress={v.rep_A14_S1} style={s.s22}>
+        <Pressable onPress={v.finishPrestart} style={s.s22}>
           <Text style={s.s23}>Finish inspection</Text>
         </Pressable>
       </ScrollView>

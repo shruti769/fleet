@@ -105,23 +105,29 @@ export default function ScreenA27_S1() {
               <Path d="M9 6l6 6-6 6" />
             </Svg>
           </Pressable>
-          <Pressable onPress={v.gatePrestart} style={s.s33}>
-            <View style={s.s34}>
-              <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-                <Rect x="5" y="11" width={14} height={9} rx="2" />
-                <Path d="M8 11V8a4 4 0 0 1 8 0v3" />
-              </Svg>
+          <Pressable onPress={v.gatePrestart} style={[s.s33, v.fitForDutyComplete ? s.prestartUnlocked : null]}>
+            <View style={[s.s34, v.fitForDutyComplete ? s.prestartIconUnlocked : null]}>
+              {v.fitForDutyComplete ? (
+                <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <Path d="M5 12.5l4.5 4.5L19 7" />
+                </Svg>
+              ) : (
+                <Svg width={22} height={22} viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <Rect x="5" y="11" width={14} height={9} rx="2" />
+                  <Path d="M8 11V8a4 4 0 0 1 8 0v3" />
+                </Svg>
+              )}
             </View>
             <View style={s.s5}>
-              <Text style={s.s35}>
+              <Text style={[s.s35, v.fitForDutyComplete ? s.prestartTextUnlocked : null]}>
                 Pre start inspection
               </Text>
               <Text style={s.s36}>
                 16 checks on 1RG4XT
               </Text>
             </View>
-            <View style={s.s37}>
-              <Text style={s.s38}>Locked</Text>
+            <View style={[s.s37, v.fitForDutyComplete ? s.prestartBadgeUnlocked : null]}>
+              <Text style={[s.s38, v.fitForDutyComplete ? s.prestartBadgeTextUnlocked : null]}>{v.preStartComplete ? 'Complete' : v.fitForDutyComplete ? 'Ready' : 'Locked'}</Text>
             </View>
           </Pressable>
         </View>
@@ -503,5 +509,20 @@ const s = StyleSheet.create({
     height: 56,
     justifyContent: "center",
     width: "100%",
+  },
+  prestartUnlocked: {
+    opacity: 1,
+  },
+  prestartIconUnlocked: {
+    backgroundColor: "#EFF6FF",
+  },
+  prestartTextUnlocked: {
+    color: "#0F1B2A",
+  },
+  prestartBadgeUnlocked: {
+    backgroundColor: "#EFF6FF",
+  },
+  prestartBadgeTextUnlocked: {
+    color: "#2563EB",
   },
 });
